@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Store</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <nav class="container">
+      <div class="logo">Store</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="debug.html">Debug</a></li>
+      </ul>
+      <div id="user-info" class="user-info"></div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="section" style="max-width: 400px; margin: 0 auto;">
+      <h1>Sign Up / Login</h1>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="user001@demo.com">
+        </div>
+        <div class="form-group">
+          <label for="plan">Plan</label>
+          <select id="plan" required>
+            <option value="trial">Trial</option>
+            <option value="pro">Pro</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Sign Up / Login</button>
+      </form>
+      <div style="margin-top: 2rem; text-align: center;">
+        <button id="logout-btn" class="btn btn-secondary">Logout</button>
+      </div>
+      <div style="margin-top: 2rem; padding: 1rem; background: #f7fafc; border-radius: 5px;">
+        <h3>Consent Status: <span id="consent-status" class="ok">Granted</span></h3>
+        <button id="toggle-consent" class="btn btn-secondary">Toggle Consent</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2023 Store. All rights reserved.</p>
+      <div>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const plan = document.getElementById('plan').value;
+
+      fireSignupStarted();
+      identifyUser(email, plan);
+      alert('Logged in successfully!');
+    });
+
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      resetIdentity();
+      alert('Logged out successfully!');
+    });
+
+    document.getElementById('toggle-consent').addEventListener('click', function() {
+      setConsent(!consentGranted);
+    });
+
+    analytics.ready(function() {
+      firePage('login');
+    });
+  </script>
+</body>
+</html>

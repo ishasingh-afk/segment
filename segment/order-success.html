@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Success - Store</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <nav class="container">
+      <div class="logo">Store</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="debug.html">Debug</a></li>
+      </ul>
+      <div id="user-info" class="user-info"></div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="section" style="text-align: center; max-width: 600px; margin: 0 auto;">
+      <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+      <h1>Order Successful!</h1>
+      <p>Thank you for your purchase. Your order has been confirmed.</p>
+      <div id="order-details" style="margin: 2rem 0; padding: 2rem; background: #f7fafc; border-radius: 10px;">
+        <!-- Order details will be populated by JavaScript -->
+      </div>
+      <div style="margin-top: 2rem;">
+        <a href="products.html" class="btn btn-primary">Continue Shopping</a>
+        <a href="index.html" class="btn btn-secondary" style="margin-left: 1rem;">Back to Home</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2023 Store. All rights reserved.</p>
+      <div>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    function loadOrderDetails() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('order');
+
+      if (orderId) {
+        document.getElementById('order-details').innerHTML = `
+          <h3>Order Confirmation</h3>
+          <p><strong>Order ID:</strong> ${orderId}</p>
+          <p><strong>Status:</strong> Confirmed</p>
+          <p><strong>Estimated Delivery:</strong> 3-5 business days</p>
+          <p>You will receive an email confirmation shortly.</p>
+        `;
+      } else {
+        document.getElementById('order-details').innerHTML = `
+          <p>Order details not available.</p>
+        `;
+      }
+    }
+
+    analytics.ready(function() {
+      firePage('success');
+      loadOrderDetails();
+    });
+  </script>
+</body>
+</html>

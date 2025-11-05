@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Datadrone | Segment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+  <script>
+  !function(){var i="analytics",analytics=window[i]=window[i]||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","screen","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware","register"];analytics.factory=function(e){return function(){if(window[i].initialized)return window[i][e].apply(window[i],arguments);var n=Array.prototype.slice.call(arguments);if(["track","screen","alias","group","page","identify"].indexOf(e)>-1){var c=document.querySelector("link[rel='canonical']");n.push({__t:"bpc",c:c&&c.getAttribute("href")||void 0,p:location.pathname,u:location.href,s:location.search,t:document.title,r:document.referrer})}n.unshift(e);analytics.push(n);return analytics}};for(var n=0;n<analytics.methods.length;n++){var key=analytics.methods[n];analytics[key]=analytics.factory(key)}analytics.load=function(key,n){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.setAttribute("data-global-segment-analytics-key",i);t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r);analytics._loadOptions=n};analytics._writeKey="wcQ0XOz2GgLkbOdcr5Lq0RfbbzTa1kyJ";;analytics.SNIPPET_VERSION="5.2.0";
+  analytics.load("wcQ0XOz2GgLkbOdcr5Lq0RfbbzTa1kyJ");
+  analytics.page();
+  }}();
+</script>
+
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0;background:#0f172a;color:#e2e8f0}
+    header{padding:16px 24px;background:#111827;display:flex;justify-content:space-between;align-items:center}
+    .pill{background:#10b981;color:#052e25;padding:4px 10px;border-radius:999px;font-size:12px}
+    main{max-width:980px;margin:24px auto;padding:0 16px}
+    .card{background:#111827;border:1px solid #1f2937;border-radius:14px;padding:18px;margin-bottom:18px}
+    button{border:0;border-radius:10px;padding:10px 14px;background:#334155;color:#e2e8f0;cursor:pointer}
+    button.primary{background:#2563eb}
+    input,select{background:#0b1220;border:1px solid #243048;color:#e2e8f0;padding:10px;border-radius:10px}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+    small{color:#94a3b8}
+    .ok{color:#22c55e} .warn{color:#f59e0b}
+    a{color:#60a5fa}
+  </style>
+</head>
+<body>
+  <header>
+    <div><strong>Datadrone</strong> <span class="pill">Segment E2E</span></div>
+    <div id="consentStatus" class="pill" style="background:#334155;color:#cbd5e1">Consent: Unknown</div>
+  </header>
+
+  <main>
+    <!-- 1) Consent -->
+    <section class="card">
+      <h3>1) Consent</h3>
+      <p>Toggle marketing consent and we’ll propagate <code>consent_marketing</code> with every event.</p>
+      <div class="row">
+        <button id="grantConsent" class="primary">Grant Consent</button>
+        <button id="revokeConsent">Revoke Consent</button>
+      </div>
+      <small>Stored in <code>localStorage.consent_marketing</code>.</small>
+    </section>
+
+    <!-- 2) Browse / Product view -->
+    <section class="card">
+      <h3>2) Browse & Product</h3>
+      <div class="row">
+        <button id="btnPage" class="primary">Send Page View</button>
+        <button id="btnProduct">product_viewed</button>
+        <button id="btnAddToCart">add_to_cart</button>
+      </div>
+      <small>Open Segment → Source → <em>Debugger</em> to see these in &lt;3s.</small>
+    </section>
+
+    <!-- 3) Signup / Identify -->
+    <section class="card">
+      <h3>3) Signup → Identify (anon → known)</h3>
+      <div class="row">
+        <input id="email" placeholder="email e.g. user001@demo.com" style="min-width:260px"/>
+        <select id="plan">
+          <option value="trial">trial</option>
+          <option value="pro">pro</option>
+        </select>
+        <button id="btnSignup" class="primary">signup_started</button>
+        <button id="btnIdentify">identify (login)</button>
+        <button id="btnReset">reset (logout)</button>
+      </div>
+      <small>Use the same userId after login to stitch anonymous &rarr; known.</small>
+    </section>
+
+    <!-- 4) Checkout -->
+    <section class="card">
+      <h3>4) Checkout</h3>
+      <div class="row">
+        <input id="amount" type="number" placeholder="order value (e.g., 49.99)" value="49.99" />
+        <button id="btnPurchase" class="primary">order_completed</button>
+      </div>
+      <small>Validate in GA4 → Realtime (event parameters will arrive within ~1–3 mins).</small>
+    </section>
+
+    <!-- 5) Status & Help -->
+    <section class="card">
+      <h3>Status / Help</h3>
+      <div class="grid">
+        <div>
+          <strong>Debugger</strong><br/>
+          Connections → Sources → <em>demo_retail_web</em> → <a href="#" onclick="openDebugger()">Debugger</a>
+        </div>
+        <div>
+          <strong>Destination</strong><br/>
+          GA4 (Realtime & DebugView)
+        </div>
+        <div>
+          <strong>Tips</strong><br/>
+          If nothing shows, check WRITE KEY, ad-blockers, JSON, or consent set to true.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ---------- Consent helpers ----------
+    function getConsent(){ return localStorage.getItem('consent_marketing') === 'true'; }
+    function setConsent(v){
+      localStorage.setItem('consent_marketing', v ? 'true' : 'false');
+      document.getElementById('consentStatus').textContent = 'Consent: ' + (v ? 'Granted' : 'Revoked');
+      document.getElementById('consentStatus').style.background = v ? '#10b981' : '#334155';
+      document.getElementById('consentStatus').style.color = v ? '#052e25' : '#cbd5e1';
+    }
+    // Initialize UI
+    setConsent(getConsent());
+
+    // ---------- Utilities ----------
+    function withProps(extra){
+      return Object.assign({ consent_marketing: getConsent() }, extra || {});
+    }
+    function openDebugger(){
+      // Update this to your actual Debugger URL if you want
+      alert('Open Segment → Connections → Sources → demo_retail_web → Debugger');
+    }
+
+    // ---------- Event bindings ----------
+    document.getElementById('grantConsent').onclick = ()=> setConsent(true);
+    document.getElementById('revokeConsent').onclick = ()=> setConsent(false);
+
+    document.getElementById('btnPage').onclick = ()=>{
+      analytics.page('Store', withProps({ page_category: 'home' }));
+      console.log('[Segment] page fired');
+    };
+
+    document.getElementById('btnProduct').onclick = ()=>{
+      analytics.track('product_viewed', withProps({
+        product_id: 'SKU-001', product_name: 'Tee', price: 19.99
+      }));
+      console.log('[Segment] product_viewed');
+    };
+
+    document.getElementById('btnAddToCart').onclick = ()=>{
+      analytics.track('add_to_cart', withProps({
+        product_id: 'SKU-001', qty: 1, line_total: 19.99
+      }));
+      console.log('[Segment] add_to_cart');
+    };
+
+    document.getElementById('btnSignup').onclick = ()=>{
+      analytics.track('signup_started', withProps({
+        source: 'web'
+      }));
+      console.log('[Segment] signup_started');
+    };
+
+    document.getElementById('btnIdentify').onclick = ()=>{
+      const email = (document.getElementById('email').value || '').trim();
+      const plan = document.getElementById('plan').value;
+      if(!email){ alert('Enter email before identify'); return; }
+      const userId = email.split('@')[0]; // simple demo id (user001)
+      analytics.identify(userId, { email, plan });
+      console.log('[Segment] identify', userId);
+    };
+
+    document.getElementById('btnReset').onclick = ()=>{
+      analytics.reset(); // clears anonymousId & traits (logout)
+      console.log('[Segment] reset (logout)');
+    };
+
+    document.getElementById('btnPurchase').onclick = ()=>{
+      const amount = parseFloat(document.getElementById('amount').value || '0');
+      analytics.track('order_completed', withProps({
+        order_value: amount, currency: 'USD', items: [{ id: 'SKU-001', qty: 1, price: amount }]
+      }));
+      console.log('[Segment] order_completed');
+    };
+  </script>
+</body>
+</html>

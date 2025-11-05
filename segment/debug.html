@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Tools - Store</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <nav class="container">
+      <div class="logo">Store</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Products</a></li>
+        <li><a href="cart.html">Cart (<span id="cart-count">0</span>)</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="debug.html">Debug</a></li>
+      </ul>
+      <div id="user-info" class="user-info"></div>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="section">
+      <h1>Debug Tools</h1>
+      <p>Use these tools to test Segment events and simulate user behavior.</p>
+
+      <div class="debug-tools">
+        <h3>Manual Event Firing</h3>
+        <div class="debug-grid">
+          <button class="btn btn-secondary" data-fire-event="page">Fire Page View</button>
+          <button class="btn btn-secondary" data-fire-event="product_viewed">Fire Product Viewed</button>
+          <button class="btn btn-secondary" data-fire-event="add_to_cart">Fire Add to Cart</button>
+          <button class="btn btn-secondary" data-fire-event="signup_started">Fire Signup Started</button>
+          <button class="btn btn-secondary" data-fire-event="checkout_started">Fire Checkout Started</button>
+          <button class="btn btn-secondary" data-fire-event="order_completed">Fire Order Completed</button>
+        </div>
+      </div>
+
+      <div class="debug-tools">
+        <h3>Identity Management</h3>
+        <div class="debug-grid">
+          <button class="btn btn-secondary" onclick="identifyUser('debug001@demo.com', 'trial')">Identify as Debug User</button>
+          <button class="btn btn-danger" onclick="resetIdentity()">Reset Identity</button>
+        </div>
+      </div>
+
+      <div class="debug-tools">
+        <h3>Consent Management</h3>
+        <div class="debug-grid">
+          <button class="btn btn-secondary" onclick="setConsent(true)">Grant Consent</button>
+          <button class="btn btn-secondary" onclick="setConsent(false)">Revoke Consent</button>
+        </div>
+        <p>Current Status: <span id="consent-status" class="ok">Granted</span></p>
+      </div>
+
+      <div class="debug-tools">
+        <h3>Traffic Simulation</h3>
+        <p>Simulate multiple users browsing and purchasing:</p>
+        <button id="simulate-traffic" class="btn btn-primary">Run Traffic Simulation</button>
+        <small>This will fire events for 3 simulated users with random carts.</small>
+      </div>
+
+      <div class="debug-tools">
+        <h3>Quick Links</h3>
+        <div class="debug-grid">
+          <a href="https://app.segment.com/" target="_blank" class="btn btn-secondary">Open Segment Dashboard</a>
+          <a href="https://analytics.google.com/" target="_blank" class="btn btn-secondary">Open Google Analytics</a>
+          <a href="https://webhook.site/" target="_blank" class="btn btn-secondary">Open Webhook.site</a>
+        </div>
+      </div>
+
+      <div class="debug-tools">
+        <h3>Current State</h3>
+        <div id="debug-info">
+          <!-- Debug info will be populated by JavaScript -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2023 Store. All rights reserved.</p>
+      <div>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    function updateDebugInfo() {
+      const debugInfo = document.getElementById('debug-info');
+      const anonId = analytics.user().anonymousId();
+      const userId = analytics.user().id();
+
+      debugInfo.innerHTML = `
+        <p><strong>Anonymous ID:</strong> ${anonId || 'N/A'}</p>
+        <p><strong>User ID:</strong> ${userId || 'Anonymous'}</p>
+        <p><strong>Consent Granted:</strong> ${consentGranted ? 'Yes' : 'No'}</p>
+        <p><strong>Cart Items:</strong> ${cart.length}</p>
+        <p><strong>Cart Value:</strong> $${getCartValue().toFixed(2)}</p>
+      `;
+    }
+
+    analytics.ready(function() {
+      firePage('debug');
+      updateDebugInfo();
+    });
+
+    // Update debug info periodically
+    setInterval(updateDebugInfo, 1000);
+  </script>
+</body>
+</html>
