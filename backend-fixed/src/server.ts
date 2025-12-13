@@ -8,6 +8,7 @@ import { openai } from "./aiClient.js";
 import {
   generateSpecFromIntake,
   generateCanonicalSpecFromIntake,
+  normalizeCanonicalSpec,
 } from "./specpilotService.js";
 import { transformToSegmentTrackingPlan } from "./adapters/segmentAdapter.js";
 import { transformToTealiumCdp } from "./adapters/tealiumAdapter.js";
@@ -147,7 +148,7 @@ app.post("/api/specpilot/adapters", async (req: Request, res: Response) => {
       return res.status(400).json({ ok: false, error: "Missing input" });
     }
 
-    const canonicalSpec = await generateCanonicalSpecFromIntake(input);
+    const canonicalSpec = normalizeCanonicalSpec(await generateCanonicalSpecFromIntake(input));
     const segment = transformToSegmentTrackingPlan(canonicalSpec);
     const tealium = transformToTealiumCdp(canonicalSpec);
     const mparticle = transformToMParticleCdp(canonicalSpec);
@@ -173,9 +174,10 @@ app.post("/api/specpilot/adapters-from-canonical", async (req: Request, res: Res
       return res.status(400).json({ ok: false, error: "Missing canonicalSpec" });
     }
 
-    const segment = transformToSegmentTrackingPlan(canonicalSpec);
-    const tealium = transformToTealiumCdp(canonicalSpec);
-    const mparticle = transformToMParticleCdp(canonicalSpec);
+    const normalized = normalizeCanonicalSpec(canonicalSpec);
+    const segment = transformToSegmentTrackingPlan(normalized);
+    const tealium = transformToTealiumCdp(normalized);
+    const mparticle = transformToMParticleCdp(normalized);
 
     res.json({
       ok: true,
@@ -253,7 +255,7 @@ app.post("/api/specpilot/save", async (req: Request, res: Response) => {
 
     const stored = saveSpec(clientId, {
       id,
-      canonicalSpec,
+      canonicalSpec: normalizeCanonicalSpec(canonicalSpec),
       markdownSpec,
       status: status || "draft",
       title,
