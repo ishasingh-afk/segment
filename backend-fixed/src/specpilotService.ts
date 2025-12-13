@@ -4,6 +4,7 @@ export interface CanonicalSpec {
   metadata: {
     title: string;
     description: string;
+    summary?: string;
     version: string;
     created_at: string;
   };
@@ -24,6 +25,9 @@ export interface CanonicalEvent {
   };
   business_rules: string[];
   technical_rules: string[];
+  validation?: {
+    overall_score?: number;
+  };
 }
 
 export interface CanonicalProperty {
@@ -53,13 +57,14 @@ Return a JSON object with this exact structure:
 {
   "metadata": {
     "title": "string",
-    "description": "string",
+    "description": "string",          // what the spec covers
+    "summary": "string",              // short 1-2 sentence summary
     "version": "1.0.0",
     "created_at": "ISO date string"
   },
   "events": [
     {
-      "name": "Event Name",
+      "name": "Event Name",                     // concise, Title Case
       "description": "What this event captures",
       "trigger": "When this event fires",
       "properties": [
@@ -76,16 +81,22 @@ Return a JSON object with this exact structure:
         "secondary": ["email", "phone"]
       },
       "business_rules": ["Rule 1", "Rule 2"],
-      "technical_rules": ["Rule 1", "Rule 2"]
+      "technical_rules": ["Rule 1", "Rule 2"],
+      "validation": { "overall_score": 80 }     // 0-100
     }
   ],
-  "destinations": ["Segment", "BigQuery", "etc"],
+  "destinations": ["segment", "tealium", "mparticle"],   // lowercase slugs
   "acceptance_criteria": ["Criterion 1", "Criterion 2"],
   "open_questions": ["Question 1", "Question 2"]
 }
 
-Generate 3-6 events that cover the complete user journey for the requested tracking.
-Return ONLY valid JSON, no markdown code blocks.`;
+Rules:
+- Generate 3-6 events that cover the end-to-end user journey.
+- Use concise, implementation-ready names and triggers.
+- Every event must have at least 3 properties and at least 1 required property.
+- Provide at least 2 acceptance_criteria and at least 2 open_questions.
+- Destinations must be lowercase slugs from: segment, tealium, mparticle, salesforce, adobe (choose at least two).
+- Return ONLY valid JSON (no markdown, no code fences).`;
 
 export async function generateSpecFromIntake(input: string): Promise<string> {
   const response = await openai.chat.completions.create({

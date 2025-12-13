@@ -154,7 +154,9 @@ app.post("/api/specpilot/adapters", async (req: Request, res: Response) => {
 
     res.json({
       ok: true,
-      adapters: { segment, tealium, mparticle },
+      segment,
+      tealium,
+      mparticle,
       canonicalSpec,
     });
   } catch (err: any) {
@@ -177,7 +179,9 @@ app.post("/api/specpilot/adapters-from-canonical", async (req: Request, res: Res
 
     res.json({
       ok: true,
-      adapters: { segment, tealium, mparticle },
+      segment,
+      tealium,
+      mparticle,
     });
   } catch (err: any) {
     console.error("Adapters error:", err);
@@ -316,7 +320,7 @@ app.get("/api/specpilot/spec/:id", async (req: Request, res: Response) => {
       return res.status(404).json({ ok: false, error: "Spec not found" });
     }
 
-    res.json({ ok: true, spec });
+    res.json({ ok: true, stored: spec });
   } catch (err: any) {
     console.error("Get spec error:", err);
     res.status(500).json({ ok: false, error: err.message });
