@@ -39,6 +39,11 @@ interface MParticleDataPoint {
 interface MParticleAttribute {
   type: string;
   description: string;
+  examples?: (string | number | boolean)[];
+  format?: string;
+  enum?: string[];
+  minimum?: number;
+  maximum?: number;
 }
 
 export function transformToMParticleCdp(canonicalSpec: any): MParticleSpec {
@@ -47,10 +52,19 @@ export function transformToMParticleCdp(canonicalSpec: any): MParticleSpec {
     const required: string[] = [];
 
     (event.properties || []).forEach((prop: any) => {
-      properties[prop.name] = {
+      const mparticleProp: MParticleAttribute = {
         type: mapTypeToMParticle(prop.type),
         description: prop.description || "",
       };
+
+      // Include optional constraint fields (JSON Schema compatible)
+      if (prop.example !== undefined) mparticleProp.examples = [prop.example];
+      if (prop.format) mparticleProp.format = prop.format;
+      if (Array.isArray(prop.enum) && prop.enum.length > 0) mparticleProp.enum = prop.enum;
+      if (typeof prop.min === "number") mparticleProp.minimum = prop.min;
+      if (typeof prop.max === "number") mparticleProp.maximum = prop.max;
+
+      properties[prop.name] = mparticleProp;
       if (prop.required) {
         required.push(prop.name);
       }

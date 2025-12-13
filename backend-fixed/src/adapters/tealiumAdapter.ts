@@ -15,16 +15,32 @@ interface TealiumAttribute {
   type: string;
   required: boolean;
   description: string;
+  example?: string | number | boolean;
+  format?: string;
+  allowed_values?: string[];
+  min_value?: number;
+  max_value?: number;
 }
 
 export function transformToTealiumCdp(canonicalSpec: any): TealiumSpec {
   const events: TealiumEvent[] = (canonicalSpec.events || []).map((event: any) => {
-    const attributes: TealiumAttribute[] = (event.properties || []).map((prop: any) => ({
-      name: prop.name,
-      type: mapTypeToTealium(prop.type),
-      required: prop.required || false,
-      description: prop.description || "",
-    }));
+    const attributes: TealiumAttribute[] = (event.properties || []).map((prop: any) => {
+      const attr: TealiumAttribute = {
+        name: prop.name,
+        type: mapTypeToTealium(prop.type),
+        required: prop.required || false,
+        description: prop.description || "",
+      };
+
+      // Include optional constraint fields
+      if (prop.example !== undefined) attr.example = prop.example;
+      if (prop.format) attr.format = prop.format;
+      if (Array.isArray(prop.enum) && prop.enum.length > 0) attr.allowed_values = prop.enum;
+      if (typeof prop.min === "number") attr.min_value = prop.min;
+      if (typeof prop.max === "number") attr.max_value = prop.max;
+
+      return attr;
+    });
 
     return {
       event_name: event.name,

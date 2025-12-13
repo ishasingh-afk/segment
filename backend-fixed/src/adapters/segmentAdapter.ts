@@ -19,6 +19,11 @@ interface SegmentEvent {
 interface SegmentProperty {
   type: string;
   description: string;
+  example?: string | number | boolean;
+  format?: string;
+  enum?: string[];
+  minimum?: number;
+  maximum?: number;
 }
 
 export function transformToSegmentTrackingPlan(canonicalSpec: any): SegmentTrackingPlan {
@@ -27,10 +32,19 @@ export function transformToSegmentTrackingPlan(canonicalSpec: any): SegmentTrack
     const required: string[] = [];
 
     (event.properties || []).forEach((prop: any) => {
-      properties[prop.name] = {
+      const segmentProp: SegmentProperty = {
         type: mapTypeToSegment(prop.type),
         description: prop.description || "",
       };
+
+      // Include optional constraint fields
+      if (prop.example !== undefined) segmentProp.example = prop.example;
+      if (prop.format) segmentProp.format = prop.format;
+      if (Array.isArray(prop.enum) && prop.enum.length > 0) segmentProp.enum = prop.enum;
+      if (typeof prop.min === "number") segmentProp.minimum = prop.min;
+      if (typeof prop.max === "number") segmentProp.maximum = prop.max;
+
+      properties[prop.name] = segmentProp;
       if (prop.required) {
         required.push(prop.name);
       }
