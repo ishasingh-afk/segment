@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
+
 // ============================================================================
 // DESIGN TOKENS (PRD: Inter 14-16px, Walmart-blue CTAs, white cards)
 // ============================================================================
@@ -56,7 +56,7 @@ function getOrCreateClientId(): string {
 }
 
 const CLIENT_ID = getOrCreateClientId();
-
+const API_BASE = "http://localhost:4000";
 
 // ============================================================================
 // AUTHENTICATION TYPES & DEMO USERS
@@ -7472,8 +7472,8 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
         }}
       >
         {/* App Name */}
-        <div style={{ padding: "12px 16px", borderBottom: "1px solid #334155" }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#cbd5e1" }}>SpecPilot</div>
+        <div style={{ padding: "16px", borderBottom: "1px solid #334155" }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>SpecPilot</div>
           <div style={{ fontSize: 11, color: "#64748b" }}>CDP Intake Transformer</div>
         </div>
 
