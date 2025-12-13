@@ -1,0 +1,2301 @@
+[
+  {
+    "id": "ca042569-bd2a-4c0a-bf77-250e59880101",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Video Watch Without Subscription",
+        "summary": "This tracking requirement captures users who watch a video but do not subscribe to the channel. It aims to understand user engagement and potential barriers to subscription.",
+        "requestor": null,
+        "submitted_at": "2025-11-27T14:17:58.858Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Video Watched",
+          "description": "Captures the event when a user watches a video without subscribing.",
+          "trigger": "User finishes watching a video",
+          "properties": [
+            {
+              "name": "video_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the video watched",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "watch_duration",
+              "type": "number",
+              "required": true,
+              "description": "Duration of the video watched in seconds",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the video was watched",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [],
+            "stitching_assumptions": "User is identified by a unique user ID"
+          },
+          "business_rules": [
+            "User must have watched the video for a minimum duration"
+          ],
+          "technical_rules": [
+            "Video ID must be a valid format",
+            "Watch duration must be a positive number"
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [],
+            "overall_score": 100
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Analytics Platform",
+          "requirements": [
+            "Must include video_id and watch_duration",
+            "Timestamp must be in ISO 8601 format"
+          ],
+          "notes": "Data should be sent in real-time for immediate analysis"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when a user finishes watching a video",
+        "All required properties are included in the event payload"
+      ],
+      "open_questions": [
+        "What is the minimum watch duration to consider the video as 'watched'?",
+        "Are there any specific privacy policies that need to be adhered to for this event?"
+      ]
+    },
+    "markdownSpec": "# Video Watch Without Subscription\n\n## Summary\nThis tracking requirement captures users who watch a video but do not subscribe to the channel. It aims to understand viewer engagement and identify potential subscribers.\n\n---\n\n## Events\n\n### Video Watched Without Subscription\n**Trigger:** User finishes watching a video without clicking the subscribe button\n\n**Description:** Captures instances where a user watches a video but does not subscribe to the channel.\n\n#### Properties\n| Property       | Type    | Required | Description                                   |\n|----------------|---------|----------|-----------------------------------------------|\n| video_id       | string  | Yes      | Unique identifier for the video watched       |\n| watch_duration  | number  | Yes      | Duration of the video watched in seconds      |\n| timestamp      | string  | Yes      | The time when the video was watched           |\n\n#### Identity\n| Role    | Identifier | Notes                                                                 |\n|---------|------------|-----------------------------------------------------------------------|\n| Primary | user_id    | User can be identified through user_id, and additional identifiers may be used for cross-device tracking. |\n| Secondary | email     |                                                                       |\n| Secondary | device_id  |                                                                       |\n\n#### PII & Consent\n| Field        | PII Level | Consent Required |\n|--------------|-----------|------------------|\n| video_id     | none      | No               |\n| watch_duration| none      | No               |\n| timestamp    | none      | No               |\n\n---\n\n## Business Rules\n- User must have watched the video for at least 30 seconds.\n- User must not have clicked the subscribe button during or after watching the video.\n\n## Technical Rules\n- video_id must be a valid identifier in the system.\n- watch_duration must be a non-negative number.\n\n---\n\n## Destinations\n| Destination       | Requirements                                               |\n|-------------------|-----------------------------------------------------------|\n| Analytics Platform | video_id must be included, watch_duration must be included, timestamp must be included |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when a user watches a video without subscribing.\n- [ ] All required properties are captured and sent to the destination.\n\n---\n\n## Open Questions\n- What specific video platform is this event being tracked on?\n- Are there any additional properties that should be included?",
+    "status": "approved",
+    "comments": [
+      {
+        "id": "28ea8d17-a43e-4adb-b00f-3dc43c079ed8",
+        "author": "reviewer",
+        "text": "📝 Answers to Open Questions:\n\nQ: What is the minimum watch duration to consider the video as 'watched'?\nA: 30 mins\n\nQ: Are there any specific privacy policies that need to be adhered to for this event?\nA: no",
+        "createdAt": "2025-11-27T14:24:19.529Z"
+      }
+    ],
+    "createdAt": "2025-11-27T14:18:29.817Z",
+    "updatedAt": "2025-11-27T15:19:48.584Z"
+  },
+  {
+    "id": "3d825428-3226-4048-ad3f-fb7e5cdf1b7e",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Track Add to Cart Event",
+        "summary": "This requirement captures the event when users add items to their shopping cart, including relevant product details and user identification. It is intended for integration with analytics and marketing tools.",
+        "requestor": null,
+        "submitted_at": "2025-11-27T14:30:49.748Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Add to Cart",
+          "description": "Captures when a user adds an item to their shopping cart.",
+          "trigger": "User clicks 'Add to Cart' button",
+          "properties": [
+            {
+              "name": "product_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the product being added",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "product_name",
+              "type": "string",
+              "required": true,
+              "description": "Name of the product being added",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "price",
+              "type": "number",
+              "required": true,
+              "description": "Price of the product being added",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "number",
+              "required": true,
+              "description": "Number of items being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "user_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the user adding the item",
+              "pii": {
+                "classification": "low",
+                "reason": "Can be used to identify the user"
+              },
+              "consent": {
+                "required": true,
+                "policy_group": "user_tracking"
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the event occurred",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [],
+            "stitching_assumptions": "User is identified by their unique user ID"
+          },
+          "business_rules": [],
+          "technical_rules": [],
+          "validation": {
+            "naming": [
+              "Event name 'Add to Cart' should be Title Case (e.g., 'Cart Abandoned')"
+            ],
+            "fields": [],
+            "identity": [],
+            "consent": [
+              "Property 'product_name' contains PII and should have pii.classification = 'high'",
+              "PII field 'product_name' should have consent.required = true"
+            ],
+            "governance": [
+              "Monetary fields detected but no currency field - add currency (e.g., \"USD\")"
+            ],
+            "overall_score": 55
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Analytics Platform",
+          "requirements": [
+            "Must accept event data in JSON format",
+            "Must support user identification"
+          ],
+          "notes": "Data should flow to the analytics platform for tracking user behavior."
+        },
+        {
+          "name": "Marketing Tools",
+          "requirements": [
+            "Must accept user_id for targeting",
+            "Must support product details"
+          ],
+          "notes": "Data should flow to marketing tools for personalized campaigns."
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user adds an item to cart",
+        "All properties are captured accurately",
+        "Data flows to specified destinations"
+      ],
+      "open_questions": []
+    },
+    "markdownSpec": "# Track Add to Cart Event\n\n## Summary\nThis requirement captures the event when users add items to their shopping cart. It includes essential product details and user identification for analytics and marketing purposes.\n\n---\n\n## Events\n\n### Add to Cart\n**Trigger:** User clicks 'Add to Cart' button\n\n**Description:** Captures when a user adds an item to their shopping cart.\n\n#### Properties\n| Property      | Type    | Required | Description                                         |\n|---------------|---------|----------|-----------------------------------------------------|\n| product_id    | string  | Yes      | Unique identifier for the product being added       |\n| product_name  | string  | Yes      | Name of the product being added                      |\n| price         | number  | Yes      | Price of the product being added                     |\n| quantity      | number  | Yes      | Number of items being added to the cart             |\n| user_id       | string  | Yes      | Unique identifier for the user adding the item      |\n| timestamp     | string  | Yes      | The time when the event occurred                    |\n\n#### Identity\n| Role    | Identifier | Notes                                               |\n|---------|------------|-----------------------------------------------------|\n| Primary | user_id    | User is identified by user_id across sessions       |\n| Secondary |            |                                                     |\n\n#### PII & Consent\n| Field        | PII Level | Consent Required |\n|--------------|-----------|------------------|\n| user_id      | low       | Yes              |\n| product_name  | none      | No               |\n| product_id    | none      | No               |\n| price         | none      | No               |\n| quantity      | none      | No               |\n| timestamp     | none      | No               |\n\n---\n\n## Business Rules\n- None specified.\n\n## Technical Rules\n- None specified.\n\n---\n\n## Destinations\n| Destination        | Requirements                                           |\n|--------------------|-------------------------------------------------------|\n| Analytics Platform  | Must accept event data in JSON format                 |\n|                    | Must support user identification                       |\n| Marketing Tools     | Must support user segmentation based on cart activity |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user adds an item to cart\n- [ ] All required properties are captured accurately\n\n---\n\n## Open Questions\n- None specified.",
+    "status": "approved",
+    "comments": [
+      {
+        "id": "8f09ee42-e75b-4d71-9a71-293b7b8ffee2",
+        "author": "reviewer",
+        "text": "test",
+        "createdAt": "2025-11-27T14:36:52.236Z"
+      }
+    ],
+    "createdAt": "2025-11-27T14:31:22.438Z",
+    "updatedAt": "2025-12-06T19:52:36.954Z"
+  },
+  {
+    "id": "0a9fd0e4-3960-4fa0-b9e7-64ecd768fd11",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Track Wishlist Item Addition",
+        "summary": "This requirement captures the event of a user adding an item to their wishlist without making a purchase. It aims to understand user interest in products.",
+        "requestor": null,
+        "submitted_at": "2025-11-27T15:21:52.722Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Add to Wishlist",
+          "description": "Captures when a user adds an item to their wishlist.",
+          "trigger": "User clicks 'Add to Wishlist' button for a product.",
+          "properties": [
+            {
+              "name": "item_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the item being added to the wishlist.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the item was added to the wishlist.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "phone"
+            ],
+            "stitching_assumptions": "User can be identified through their user_id, and additional identifiers can help in linking sessions."
+          },
+          "business_rules": [
+            "User must be logged in to add items to the wishlist."
+          ],
+          "technical_rules": [
+            "item_id must be a valid identifier in the product catalog."
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [],
+            "overall_score": 100
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Analytics Platform",
+          "requirements": [
+            "Must receive item_id and timestamp fields."
+          ],
+          "notes": "Data should be sent in real-time for immediate analysis."
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when the user adds an item to the wishlist.",
+        "All required properties are captured and sent to the destination."
+      ],
+      "open_questions": [
+        "What specific user identifiers are available for tracking?",
+        "Are there any specific privacy policies that need to be adhered to for wishlist tracking?"
+      ]
+    },
+    "markdownSpec": "# Track Wishlist Item Addition\n\n## Summary\nThis tracking requirement captures events related to users adding items to their wishlist without making a purchase. It aims to understand user preferences and engagement with wishlist functionality.\n\n---\n\n## Events\n\n### Add to Wishlist\n**Trigger:** User clicks 'Add to Wishlist' button for an item.\n\n**Description:** Captures when a user adds an item to their wishlist.\n\n#### Properties\n| Property   | Type   | Required | Description                                                  |\n|------------|--------|----------|--------------------------------------------------------------|\n| item_id   | string | Yes      | Unique identifier for the item being added to the wishlist. |\n| timestamp  | string | Yes      | The time when the item was added to the wishlist.           |\n\n#### Identity\n| Role     | Identifier | Notes                                         |\n|----------|------------|-----------------------------------------------|\n| Primary  | user_id    | User is identified by a unique user_id.      |\n| Secondary|            |                                               |\n\n#### PII & Consent\n| Field     | PII Level | Consent Required |\n|-----------|-----------|------------------|\n| item_id   | none      | No               |\n| timestamp  | none      | No               |\n\n---\n\n## Business Rules\n- User must be logged in to add items to the wishlist.\n\n## Technical Rules\n- item_id must be a valid identifier in the system.\n\n---\n\n## Destinations\n| Destination        | Requirements                          |\n|--------------------|---------------------------------------|\n| Analytics Platform  | Must receive item_id and timestamp.  |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when an item is added to the wishlist.\n- [ ] All required properties are included in the event.\n\n---\n\n## Open Questions\n- What specific user actions should be tracked beyond adding to wishlist?\n- Are there any additional properties needed for this event?",
+    "status": "draft",
+    "comments": [],
+    "createdAt": "2025-11-27T15:22:16.855Z",
+    "updatedAt": "2025-11-27T15:22:16.855Z"
+  },
+  {
+    "id": "c1171949-a6ab-4abf-9f53-129e40224cdb",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Add to Cart Conversion",
+        "summary": "This event captures when a user adds a product to their shopping cart, indicating intent to purchase. It helps track conversion rates and user engagement with products.",
+        "requestor": null,
+        "submitted_at": "2025-11-27T15:44:28.126Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Add to Cart",
+          "description": "Captures the action of a user adding a product to their shopping cart.",
+          "trigger": "When a user clicks the 'Add to Cart' button for a product.",
+          "properties": [
+            {
+              "name": "item_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the product being added.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "product_name",
+              "type": "string",
+              "required": true,
+              "description": "Name of the product being added.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "price",
+              "type": "number",
+              "required": true,
+              "description": "Price of the product at the time of addition.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "number",
+              "required": true,
+              "description": "Number of units of the product being added.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "category",
+              "type": "string",
+              "required": false,
+              "description": "Category of the product being added.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the product was added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "anonymous_id"
+            ],
+            "stitching_assumptions": "User actions are linked through user_id or anonymous_id."
+          },
+          "business_rules": [
+            "The product must be available in stock.",
+            "The user must be logged in or identified as an anonymous user."
+          ],
+          "technical_rules": [
+            "item_id must be a valid product identifier.",
+            "price must be a positive number.",
+            "quantity must be a positive integer."
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [
+              "Monetary fields detected but no currency field - add currency (e.g., \"USD\")"
+            ],
+            "overall_score": 95
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Analytics Platform",
+          "requirements": [
+            "Must accept all event properties",
+            "Must support user identification"
+          ],
+          "notes": "Data should flow to the analytics platform for tracking user behavior."
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when a product is added to the cart.",
+        "All required properties are captured and sent.",
+        "User identification is consistent across sessions."
+      ],
+      "open_questions": [
+        "Should we capture the product price at the time of addition or defer to a product catalog lookup?",
+        "What is the maximum quantity allowed for a single product in the cart?",
+        "Are there any specific downstream actions triggered by adding to cart?"
+      ]
+    },
+    "markdownSpec": "# Add to Cart Conversion\n\n## Summary\nThis event captures when a user adds a product to their shopping cart, indicating intent to purchase. It helps in tracking conversion rates and understanding user behavior.\n\n---\n\n## Events\n\n### Add to Cart\n**Trigger:** When a user clicks the 'Add to Cart' button for a product.\n\n**Description:** Captures the action of a user adding a product to their shopping cart.\n\n**Properties**\n| Property     | Type    | Required | Description                                                  |\n|--------------|---------|----------|--------------------------------------------------------------|\n| item_id     | string  | true     | Unique identifier for the product being added.              |\n| product_name | string  | true     | Name of the product being added to the cart.                |\n| price        | number  | true     | Price of the product at the time of addition.               |\n| quantity     | number  | true     | Number of units of the product being added.                 |\n| category     | string  | false    | Category of the product being added.                         |\n| timestamp    | string  | true     | The time when the product was added to the cart.            |\n\n**Identity**\n| Role     | Identifier  | Notes                                                                 |\n|----------|-------------|-----------------------------------------------------------------------|\n| Primary  | user_id     | User is identified by user_id if logged in, otherwise by anonymous_id. |\n| Secondary| anonymous_id |                                                                       |\n\n**PII & Consent**\n| Field      | PII Level | Consent Required |\n|------------|-----------|------------------|\n| item_id    | none      | false            |\n| product_name| none      | false            |\n| price      | none      | false            |\n| quantity   | none      | false            |\n| category   | none      | false            |\n| timestamp  | none      | false            |\n\n---\n\n## Business Rules\n- User must be authenticated or identified as anonymous.\n- Product must be available in stock.\n\n## Technical Rules\n- item_id must be a valid product identifier.\n- price must be a positive number.\n- quantity must be a positive integer.\n\n---\n\n## Destinations\n| Destination        | Requirements                                           |\n|--------------------|-------------------------------------------------------|\n| Analytics Platform  | Event name must be 'Add to Cart', All required properties must be included |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when the 'Add to Cart' button is clicked.\n- [ ] All required properties are captured and sent to the destination.\n\n---\n\n## Open Questions\n- Should we capture the product price at the time of addition or defer to a product catalog lookup?\n- What is the maximum quantity allowed for a product in the cart?\n- Are there any specific downstream actions triggered by adding to cart?",
+    "status": "draft",
+    "comments": [],
+    "createdAt": "2025-11-27T15:45:00.457Z",
+    "updatedAt": "2025-11-27T15:45:00.457Z"
+  },
+  {
+    "id": "85b5eb11-5e1c-409c-95b2-8920d2be5b46",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Ad View and Purchase Tracking",
+        "summary": "This tracking requirement captures the event of a user viewing an advertisement and subsequently making a purchase of the advertised product. It aims to analyze the effectiveness of advertisements in driving sales.",
+        "requestor": null,
+        "submitted_at": "2025-11-28T04:13:20.927Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Ad View and Purchase",
+          "description": "Captures the event when a user views an advertisement and then makes a purchase of the product advertised.",
+          "trigger": "This event fires when a user watches an advertisement and subsequently makes a purchase of the advertised product.",
+          "properties": [
+            {
+              "name": "ad_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the advertisement viewed.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "product_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the purchased product.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "ad_view_timestamp",
+              "type": "string",
+              "required": true,
+              "description": "Timestamp when the ad was completely viewed.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "purchase_timestamp",
+              "type": "string",
+              "required": true,
+              "description": "Timestamp when the purchase was completed.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "user_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the user.",
+              "pii": {
+                "classification": "low",
+                "reason": "User identification"
+              },
+              "consent": {
+                "required": true,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "ad_platform",
+              "type": "string",
+              "required": true,
+              "description": "Platform where the ad was viewed (e.g., YouTube, Facebook).",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "purchase_amount",
+              "type": "number",
+              "required": true,
+              "description": "Total amount spent on the purchase.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "currency",
+              "type": "string",
+              "required": true,
+              "description": "Currency type for the purchase amount.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "device_type",
+              "type": "string",
+              "required": true,
+              "description": "Type of device used for viewing the ad and making the purchase (e.g., mobile, desktop).",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [],
+            "stitching_assumptions": "User is identified consistently by user_id."
+          },
+          "business_rules": [],
+          "technical_rules": [],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [],
+            "overall_score": 100
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Analytics platform",
+          "requirements": [],
+          "notes": "Data should flow to analytics platforms for performance tracking."
+        },
+        {
+          "name": "Marketing automation tools",
+          "requirements": [],
+          "notes": "Data should be sent to marketing automation tools for targeted campaigns."
+        }
+      ],
+      "acceptance_criteria": [],
+      "open_questions": [
+        "What specific business rules should be applied to determine the validity of the purchase related to the ad view?",
+        "Are there any specific formats required for the timestamps?",
+        "Should we capture additional user attributes or behaviors for further analysis?"
+      ]
+    },
+    "markdownSpec": "# Ad View and Purchase Tracking\n\n## Summary\nThis tracking requirement captures the event when a user views an advertisement and subsequently makes a purchase of the advertised product. It includes details about the advertisement and the purchase transaction.\n\n---\n\n## Events\n\n### Ad View and Purchase\n**Trigger:** This event fires when a user watches an advertisement and subsequently makes a purchase of the advertised product.\n\n**Description:** Captures the event when a user watches an advertisement and then makes a purchase of the advertised product.\n\n**Properties**\n| Property            | Type    | Required | Description                                                  |\n|---------------------|---------|----------|--------------------------------------------------------------|\n| ad_id               | string  | true     | Unique identifier for the advertisement viewed.             |\n| product_id          | string  | true     | Unique identifier for the purchased product.                |\n| ad_view_timestamp    | string  | true     | Timestamp when the ad was completely viewed.                |\n| purchase_timestamp   | string  | true     | Timestamp when the purchase was completed.                  |\n| user_id             | string  | true     | Unique identifier for the user.                             |\n| ad_platform         | string  | true     | Platform where the ad was viewed (e.g., YouTube, Facebook).|\n| purchase_amount     | number  | true     | Total amount spent on the purchase.                         |\n| currency            | string  | true     | Currency type for the purchase amount.                     |\n| device_type         | string  | true     | Type of device used for viewing the ad and making the purchase (e.g., mobile, desktop). |\n\n**Identity**\n| Role     | Identifier | Notes                                             |\n|----------|------------|---------------------------------------------------|\n| Primary  | user_id    | User is identified consistently by user_id.      |\n| Secondary|            |                                                   |\n\n**PII & Consent**\n| Field        | PII Level | Consent Required |\n|--------------|-----------|------------------|\n| user_id      | low       | true             |\n\n---\n\n## Business Rules\n- The user must have viewed the advertisement completely before making a purchase.\n- The purchase must be of the product that was advertised.\n\n## Technical Rules\n- ad_view_timestamp and purchase_timestamp must be in ISO 8601 format.\n- purchase_amount must be a positive decimal value.\n\n---\n\n## Destinations\n| Destination                | Requirements                                           |\n|----------------------------|-------------------------------------------------------|\n| Analytics platform         | Support for custom event tracking, Ability to handle user identifiers |\n| Marketing automation tools  | Integration with user behavior data, Support for purchase tracking |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when the user views an ad and makes a purchase.\n- [ ] All required properties are captured and formatted correctly.\n- [ ] User consent is obtained for tracking user_id.\n\n---\n\n## Open Questions\n- Should we capture the ad_view_timestamp at the start or end of the ad view?\n- What specific ad platforms should be included in the ad_platform property?\n- Is there a need to track additional user attributes or behaviors related to this event?",
+    "status": "draft",
+    "comments": [],
+    "createdAt": "2025-11-28T04:14:01.644Z",
+    "updatedAt": "2025-11-28T04:14:01.644Z"
+  },
+  {
+    "id": "065c7ad2-168d-46a0-8911-7985210edaa6",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Track Monthly Subscription Purchase",
+        "summary": "This event captures when a customer purchases a monthly subscription, including details about the subscription plan, payment method, and any promotional codes used. It aims to provide insights into subscription sales and customer preferences.",
+        "requestor": null,
+        "submitted_at": "2025-11-28T04:34:43.982Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Monthly Subscription Purchased",
+          "description": "Captures the purchase of a monthly subscription by a customer.",
+          "trigger": "When a customer completes the payment for a monthly subscription.",
+          "properties": [
+            {
+              "name": "order_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the subscription order.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "total",
+              "type": "number",
+              "required": true,
+              "description": "Total amount charged for the subscription.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "currency",
+              "type": "string",
+              "required": true,
+              "description": "Currency in which the payment was made.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "payment_method",
+              "type": "string",
+              "required": true,
+              "description": "Method used for payment (e.g., credit card, PayPal).",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "promotional_code",
+              "type": "string",
+              "required": false,
+              "description": "Any promotional code applied to the subscription purchase.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the subscription purchase was made.",
+              "pii": {
+                "classification": "none",
+                "reason": null
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [],
+            "stitching_assumptions": "User is identified by their unique user_id."
+          },
+          "business_rules": [],
+          "technical_rules": [],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [],
+            "overall_score": 100
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Analytics Platform",
+          "requirements": [
+            "Order ID must be unique",
+            "Total must be a positive number",
+            "Currency must be a valid ISO currency code"
+          ],
+          "notes": "Data should flow to the analytics platform for reporting and analysis."
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires upon successful subscription purchase",
+        "All required properties are captured accurately"
+      ],
+      "open_questions": [
+        "What specific subscription plan details should be included in the event properties?",
+        "Are there any specific validation rules for the payment method field?",
+        "Should the promotional code be validated against a list of active codes?"
+      ]
+    },
+    "markdownSpec": "# Track Monthly Subscription Purchase\n\n## Summary\nThis event captures when a customer purchases a monthly subscription, including details about the subscription plan, payment method, and any promotional codes used. It aims to provide insights into subscription sales and customer preferences.\n\n---\n\n## Events\n\n### Monthly Subscription Purchased\n**Trigger:** When a customer completes the payment for a monthly subscription.\n\n**Description:** Captures the purchase of a monthly subscription by a customer.\n\n**Properties**\n| Property          | Type    | Required | Description                                                   |\n|-------------------|---------|----------|---------------------------------------------------------------|\n| order_id          | string  | true     | Unique identifier for the subscription order.                |\n| total             | number  | true     | Total amount charged for the subscription.                   |\n| currency          | string  | true     | Currency in which the payment was made.                       |\n| payment_method     | string  | true     | Method used for payment (e.g., credit card, PayPal).        |\n| promotional_code   | string  | false    | Any promotional code applied to the subscription purchase.    |\n| timestamp         | string  | true     | The date and time when the purchase was made.                |\n\n**Identity**\n| Role     | Identifier | Notes                                                                 |\n|----------|------------|-----------------------------------------------------------------------|\n| Primary  | user_id    | User is identified through a unique user ID associated with their account. |\n| Secondary|            |                                                                       |\n\n**PII & Consent**\n| Field            | PII Level | Consent Required |\n|------------------|-----------|------------------|\n| order_id         | none      | false            |\n| total            | none      | false            |\n| currency         | none      | false            |\n| payment_method    | none      | false            |\n| promotional_code  | none      | false            |\n| timestamp        | none      | false            |\n\n---\n\n## Business Rules\n- The subscription must be active at the time of purchase.\n- Promotional codes must be valid and applicable to the subscription plan.\n\n## Technical Rules\n- Order ID must be unique for each subscription purchase.\n- Total must be a positive number.\n\n---\n\n## Destinations\n| Destination        | Requirements                                                   |\n|--------------------|---------------------------------------------------------------|\n| Analytics Platform  | Must receive all event properties as defined.                 |\n|                    | Must handle user identification correctly.                     |\n\n## Acceptance Criteria\n- [ ] Event fires correctly upon successful subscription purchase.\n- [ ] All required properties are captured and sent to the destination.\n\n---\n\n## Open Questions\n- What specific details should be included in the subscription plan details?\n- Are there any specific formats required for the payment method or promotional code?\n- Should we capture any additional user information at the time of purchase?",
+    "status": "draft",
+    "comments": [],
+    "createdAt": "2025-11-28T04:35:14.072Z",
+    "updatedAt": "2025-11-28T04:35:14.072Z"
+  },
+  {
+    "id": "739f4c63-ae35-48e3-8ab8-5e144263403b",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Track Items Added to Shopping Cart",
+        "summary": "This event captures when users add items to their shopping cart, including essential product details. It aims to enhance user experience and optimize marketing strategies.",
+        "requestor": null,
+        "submitted_at": "2025-11-28T15:32:28.299Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Item Added to Cart",
+          "description": "Captures the action of a user adding an item to their shopping cart.",
+          "trigger": "User clicks 'Add to Cart' button for a product.",
+          "properties": [
+            {
+              "name": "item_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the product being added.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product identifier"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "product_name",
+              "type": "string",
+              "required": true,
+              "description": "Name of the product being added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product name"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "price",
+              "type": "number",
+              "required": true,
+              "description": "Price of the product at the time of addition.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product price"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "number",
+              "required": true,
+              "description": "Quantity of the product being added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains quantity information"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "category",
+              "type": "string",
+              "required": true,
+              "description": "Category of the product being added.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product category"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the item was added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains timestamp of the event"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "device_id",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID links to account, email used for marketing."
+          },
+          "business_rules": [
+            "Quantity must be greater than zero.",
+            "Item ID must correspond to an existing product."
+          ],
+          "technical_rules": [
+            "Item ID must be a valid product identifier format.",
+            "Price must be a positive number."
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [
+              "Monetary fields detected but no currency field - add currency (e.g., \"USD\")"
+            ],
+            "overall_score": 95
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Segment",
+          "requirements": [
+            "Must map to tracking plan schema",
+            "Real-time streaming required"
+          ],
+          "notes": "Primary CDP for event collection"
+        },
+        {
+          "name": "Google Analytics",
+          "requirements": [
+            "E-commerce events must follow GA4 schema"
+          ],
+          "notes": "For marketing attribution"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user adds an item to the cart.",
+        "All required properties are captured and sent to destinations.",
+        "User identity is properly resolved.",
+        "PII fields are handled according to consent preferences."
+      ],
+      "open_questions": [
+        "Should we capture the product price at the time of addition or defer to a product catalog lookup?",
+        "What is the maximum quantity allowed for a single item in the cart?",
+        "Should adding an item to the cart trigger any notifications or recommendations?"
+      ]
+    },
+    "markdownSpec": "# Track Items Added to Shopping Cart\n\n## Summary\nThis event captures when users add items to their shopping cart, including essential product details. It aims to enhance user experience and optimize marketing strategies.\n\n---\n\n## Events\n\n### Item Added to Cart\n**Trigger:** User clicks 'Add to Cart' button\n\n**Description:** Captures the action of a user adding an item to their shopping cart.\n\n**Properties**\n| Property      | Type    | Required | Description                                     |\n|---------------|---------|----------|-------------------------------------------------|\n| item_id      | string  | true     | Unique identifier for the product being added   |\n| product_name  | string  | true     | Name of the product being added                 |\n| price         | number  | true     | Price of the product being added                |\n| quantity      | number  | true     | Quantity of the product being added             |\n| category      | string  | true     | Category of the product being added             |\n| timestamp     | string  | true     | Time when the item was added to the cart       |\n\n**Identity**\n| Role     | Identifier                       | Notes                                                                                      |\n|----------|----------------------------------|--------------------------------------------------------------------------------------------|\n| Primary  | user_id                          | User ID is the primary key linked to account.                                             |\n| Secondary| email, device_id, session_id    | Email used for marketing communications. Device ID for cross-device tracking.             |\n\n**PII & Consent**\n| Field        | PII Level | Consent Required |\n|--------------|-----------|------------------|\n| item_id     | none      | No               |\n| product_name | none      | No               |\n| price        | none      | No               |\n| quantity     | none      | No               |\n| category     | none      | No               |\n| timestamp    | none      | No               |\n\n---\n\n## Business Rules\n- Quantity must be greater than zero\n- Item ID must correspond to an existing product\n\n## Technical Rules\n- Item ID must be a valid product identifier format\n- Price must be a positive number\n\n---\n\n## Destinations\n| Destination       | Requirements                                           |\n|-------------------|-------------------------------------------------------|\n| Segment           | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics   | E-commerce events must follow GA4 schema              |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the action\n- [ ] All required properties are captured and sent to destinations\n- [ ] User identity is properly resolved\n- [ ] PII fields are handled according to consent preferences\n\n---\n\n## Open Questions\n- Should we capture the product price at the time of addition or defer to a product catalog lookup?\n- What is the maximum quantity allowed for items in the cart?\n- Should adding an item to the cart trigger any downstream notifications or recommendations?",
+    "status": "draft",
+    "comments": [],
+    "createdAt": "2025-11-28T15:33:15.233Z",
+    "updatedAt": "2025-11-28T15:33:15.233Z"
+  },
+  {
+    "id": "6dcecc43-a9bf-480a-9415-134d5730888a",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Track Purchase Conversions",
+        "summary": "This requirement captures the event of users completing a purchase after adding items to their shopping cart. It includes essential details such as product IDs, quantities, total purchase amounts, and payment methods used.",
+        "requestor": null,
+        "submitted_at": "2025-11-28T15:36:10.513Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Purchase Completed",
+          "description": "Captures the event when a user completes a purchase after adding items to their shopping cart.",
+          "trigger": "User completes the checkout process",
+          "properties": [
+            {
+              "name": "order_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the order",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "total",
+              "type": "number",
+              "required": true,
+              "description": "Total amount of the purchase",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "currency",
+              "type": "string",
+              "required": true,
+              "description": "Currency used for the transaction",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "items",
+              "type": "array",
+              "required": true,
+              "description": "List of items purchased, including item details",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "payment_method",
+              "type": "string",
+              "required": true,
+              "description": "Method of payment used for the purchase",
+              "pii": {
+                "classification": "medium",
+                "reason": "May include payment method details that could be sensitive"
+              },
+              "consent": {
+                "required": true,
+                "policy_group": "analytics"
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "Time when the purchase was completed",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID links to account, email used for marketing communications."
+          },
+          "business_rules": [
+            "Order total must be greater than zero",
+            "Payment method must be valid"
+          ],
+          "technical_rules": [
+            "Order ID must be a valid UUID format",
+            "Total must be a positive number"
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [],
+            "overall_score": 100
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Segment",
+          "requirements": [
+            "Must map to tracking plan schema",
+            "Real-time streaming required"
+          ],
+          "notes": "Primary CDP for event collection"
+        },
+        {
+          "name": "Google Analytics",
+          "requirements": [
+            "E-commerce events must follow GA4 schema"
+          ],
+          "notes": "For marketing attribution"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user completes the action",
+        "All required properties are captured and sent to destinations",
+        "User identity is properly resolved",
+        "PII fields are handled according to consent preferences"
+      ],
+      "open_questions": [
+        "What specific details should be included in the 'items' array for each purchased item?",
+        "What payment methods should be supported and how should they be validated?",
+        "Should we capture additional user information at the time of purchase, such as shipping address?"
+      ]
+    },
+    "markdownSpec": "# Track Purchase Conversions\n\n## Summary\nThis requirement captures conversions when users complete a purchase after adding items to their shopping cart. It includes details such as product ID, quantity, total purchase amount, and payment method used.\n\n---\n\n## Events\n\n### Purchase Completed\n**Trigger:** User completes the checkout process\n\n**Description:** Captures the event when a user completes a purchase after adding items to their shopping cart.\n\n**Properties**\n| Property         | Type    | Required | Description                                         |\n|------------------|---------|----------|-----------------------------------------------------|\n| order_id         | string  | true     | Unique identifier for the order                     |\n| total            | number  | true     | Total amount of the purchase                        |\n| currency         | string  | true     | Currency used for the transaction                   |\n| items            | array   | true     | List of items purchased, including item details    |\n| payment_method    | string  | true     | Method of payment used for the purchase             |\n| timestamp        | string  | true     | Time when the purchase was completed                |\n\n**Identity**\n| Role     | Identifier               | Notes                                               |\n|----------|--------------------------|-----------------------------------------------------|\n| Primary  | user_id                  | User ID links to account, email used for marketing. |\n| Secondary| email, session_id        | Email for marketing and session ID for tracking.    |\n\n**PII & Consent**\n| Field          | PII Level | Consent Required |\n|----------------|-----------|------------------|\n| order_id       | none      | No               |\n| total          | none      | No               |\n| currency       | none      | No               |\n| items          | none      | No               |\n| payment_method  | medium    | Yes              |\n| timestamp      | none      | No               |\n\n---\n\n## Business Rules\n- Order total must be greater than zero\n- Payment method must be valid\n\n## Technical Rules\n- Order ID must be a valid UUID format\n- Total must be a positive number\n\n---\n\n## Destinations\n| Destination       | Requirements                                      |\n|-------------------|---------------------------------------------------|\n| Segment           | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics   | E-commerce events must follow GA4 schema          |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the action\n- [ ] All required properties are captured and sent to destinations\n- [ ] User identity is properly resolved\n- [ ] PII fields are handled according to consent preferences\n\n---\n\n## Open Questions\n- What specific details should be included in the 'items' array?\n- What payment methods should be supported and how should they be validated?\n- Should we capture the user's IP address during the purchase for fraud detection?",
+    "status": "approved",
+    "comments": [
+      {
+        "id": "5e5af872-343f-4fe9-b83c-5f0762f8ae99",
+        "author": "reviewer",
+        "text": "Answers to Open Questions:\n\nQ: What specific details should be included in the 'items' array for each purchased item?\nA: test",
+        "createdAt": "2025-11-28T15:37:42.325Z"
+      }
+    ],
+    "createdAt": "2025-11-28T15:36:50.725Z",
+    "updatedAt": "2025-11-28T15:37:42.325Z"
+  },
+  {
+    "id": "cc570e83-fc10-49b2-8379-d3d350252d10",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Convert Freemium to Premium Customers",
+        "summary": "This event captures the transition of users from a freemium model to a premium subscription. It tracks the necessary details to ensure proper billing and user identification.",
+        "requestor": null,
+        "submitted_at": "2025-11-29T04:51:44.331Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Convert Freemium to Premium",
+          "description": "Captures the event when a user upgrades from a freemium subscription to a premium subscription.",
+          "trigger": "When a user selects the upgrade option and completes the payment process.",
+          "properties": [
+            {
+              "name": "order_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the order.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "total",
+              "type": "number",
+              "required": true,
+              "description": "Total amount charged for the premium subscription.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "currency",
+              "type": "string",
+              "required": true,
+              "description": "Currency in which the payment is made.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "payment_method",
+              "type": "string",
+              "required": true,
+              "description": "Method used for payment (e.g., credit card, PayPal).",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the conversion took place.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains no personal identifiable information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID is the primary key linked to account. Email used for marketing communications."
+          },
+          "business_rules": [
+            "User must have an active freemium account before upgrading.",
+            "Total must be greater than zero."
+          ],
+          "technical_rules": [
+            "Order ID must be a valid UUID format.",
+            "Total must be a positive number."
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [],
+            "overall_score": 100
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Segment",
+          "requirements": [
+            "Must map to tracking plan schema",
+            "Real-time streaming required"
+          ],
+          "notes": "Primary CDP for event collection"
+        },
+        {
+          "name": "Google Analytics",
+          "requirements": [
+            "E-commerce events must follow GA4 schema"
+          ],
+          "notes": "For marketing attribution"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user completes the action",
+        "All required properties are captured and sent to destinations",
+        "User identity is properly resolved",
+        "PII fields are handled according to consent preferences"
+      ],
+      "open_questions": [
+        "What specific payment methods should be supported for the premium upgrade?",
+        "Is there a specific timeframe for processing the conversion from freemium to premium?",
+        "Should we track any additional user engagement metrics post-upgrade?"
+      ]
+    },
+    "markdownSpec": "# Convert Freemium to Premium Customers\n\n## Summary\nThis event captures the transition of users from freemium to premium subscription status. It tracks the necessary details to ensure proper billing and user identification.\n\n---\n\n## Events\n\n### Convert Freemium to Premium\n**Trigger:** When a user selects the upgrade option and completes the payment process.\n\n**Description:** This event captures when a user upgrades their subscription from freemium to premium.\n\n**Properties**\n| Property         | Type    | Required | Description                                           |\n|------------------|---------|----------|-------------------------------------------------------|\n| subscription_id  | string  | true     | Unique identifier for the subscription                 |\n| plan_name        | string  | true     | Name of the premium plan selected                      |\n| price            | number  | true     | Price of the premium subscription                      |\n| billing_cycle    | string  | true     | Billing cycle for the premium subscription (e.g., monthly, yearly) |\n| timestamp        | string  | true     | The time when the conversion occurred                  |\n\n**Identity**\n| Role     | Identifier                     | Notes                                                                                   |\n|----------|--------------------------------|-----------------------------------------------------------------------------------------|\n| Primary  | user_id                        | User ID is the primary key linked to account.                                           |\n| Secondary| email, device_id, session_id   | Email used for marketing communications. Device ID for cross-device tracking.          |\n\n**PII & Consent**\n| Field            | PII Level | Consent Required |\n|------------------|-----------|------------------|\n| subscription_id  | none      | No               |\n| plan_name        | none      | No               |\n| price            | none      | No               |\n| billing_cycle    | none      | No               |\n| timestamp        | none      | No               |\n\n---\n\n## Business Rules\n- User must have an active freemium account before upgrading\n- Payment must be successfully processed\n\n## Technical Rules\n- Subscription ID must be a valid UUID format\n- Price must be a positive number\n\n---\n\n## Destinations\n| Destination       | Requirements                                             |\n|-------------------|---------------------------------------------------------|\n| Segment           | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics   | E-commerce events must follow GA4 schema                |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the action\n- [ ] All required properties are captured and sent to destinations\n- [ ] User identity is properly resolved\n- [ ] PII fields are handled according to consent preferences\n\n---\n\n## Open Questions\n- What payment methods are accepted for the premium subscription?\n- Is there a specific confirmation process after the upgrade that needs to be tracked?\n- Should we capture any additional user feedback during the upgrade process?",
+    "status": "draft",
+    "comments": [],
+    "createdAt": "2025-11-29T04:52:24.477Z",
+    "updatedAt": "2025-11-29T04:52:24.477Z"
+  },
+  {
+    "id": "7d2f969e-c6f9-4d86-af92-5c4391b3c873",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Freemium to Premium Conversion",
+        "summary": "This event captures the conversion of users from freemium to premium subscription. It tracks the payment method used and the timeframe for processing the upgrade.",
+        "requestor": null,
+        "submitted_at": "2025-11-29T04:57:55.613Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Freemium Converted to Premium",
+          "description": "Tracks the conversion of a user from a freemium plan to a premium subscription.",
+          "trigger": "When a user successfully completes the payment for the premium upgrade.",
+          "properties": [
+            {
+              "name": "payment_method",
+              "type": "string",
+              "required": true,
+              "description": "The payment method used for the upgrade.",
+              "pii": {
+                "classification": "none",
+                "reason": "Does not contain personal identifiable information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "conversion_timeframe",
+              "type": "number",
+              "required": true,
+              "description": "The number of days taken to process the conversion.",
+              "pii": {
+                "classification": "none",
+                "reason": "Does not contain personal identifiable information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "mobile_app_usage",
+              "type": "boolean",
+              "required": true,
+              "description": "Indicates whether to track mobile app usage post-upgrade.",
+              "pii": {
+                "classification": "none",
+                "reason": "Does not contain personal identifiable information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The timestamp when the conversion event occurs.",
+              "pii": {
+                "classification": "none",
+                "reason": "Does not contain personal identifiable information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "device_id",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID is the primary key linked to account. Email used for marketing communications. Device ID for cross-device tracking."
+          },
+          "business_rules": [
+            "User must have an active freemium account before conversion.",
+            "Payment method must be valid and processed successfully."
+          ],
+          "technical_rules": [
+            "Payment method must match supported formats.",
+            "Timestamp must be in ISO 8601 format."
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [],
+            "overall_score": 100
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Segment",
+          "requirements": [
+            "Must map to tracking plan schema",
+            "Real-time streaming required"
+          ],
+          "notes": "Primary CDP for event collection"
+        },
+        {
+          "name": "Google Analytics",
+          "requirements": [
+            "E-commerce events must follow GA4 schema"
+          ],
+          "notes": "For marketing attribution"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user completes the payment for the premium upgrade.",
+        "All required properties are captured and sent to destinations.",
+        "User identity is properly resolved.",
+        "PII fields are handled according to consent preferences."
+      ],
+      "open_questions": [
+        "What specific user engagement metrics should be tracked post-upgrade?",
+        "Are there any additional payment methods that need to be supported?"
+      ]
+    },
+    "markdownSpec": "# Freemium to Premium Conversion\n\n## Summary\nThis event captures the conversion of users from freemium to premium subscription. It tracks the payment method used and the timeframe for processing the upgrade.\n\n---\n\n## Events\n\n### Freemium Converted to Premium\n**Trigger:** When a user successfully completes the payment for the premium upgrade.\n\n**Description:** Tracks the conversion of a user from a freemium plan to a premium subscription.\n\n**Properties**\n| Property            | Type    | Required | Description                                               |\n|---------------------|---------|----------|-----------------------------------------------------------|\n| payment_method      | string  | true     | The payment method used for the upgrade.                  |\n| conversion_timeframe| number  | true     | The number of days allowed for processing the conversion.  |\n| mobile_app_usage    | boolean | true     | Indicates whether to track mobile app usage post-upgrade. |\n| timestamp           | string  | true     | The timestamp when the conversion occurs.                 |\n\n**Identity**\n| Role     | Identifier                  | Notes                                         |\n|----------|-----------------------------|-----------------------------------------------|\n| Primary  | user_id                     | User ID links to account, email used for marketing. |\n| Secondary| email, device_id, session_id| Explain secondary identifiers.                |\n\n**PII & Consent**\n| Field            | PII Level | Consent Required |\n|------------------|-----------|------------------|\n| payment_method    | none      | No               |\n| conversion_timeframe| none    | No               |\n| mobile_app_usage  | none      | No               |\n| timestamp         | none      | No               |\n\n---\n\n## Business Rules\n- User must be on a freemium plan before conversion.\n- Payment method must be valid.\n\n## Technical Rules\n- Payment method must match supported formats.\n- Timestamp must be in ISO 8601 format.\n\n---\n\n## Destinations\n| Destination       | Requirements                                      |\n|-------------------|---------------------------------------------------|\n| Segment           | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics   | E-commerce events must follow GA4 schema         |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the payment for the premium upgrade.\n- [ ] All required properties are captured and sent to destinations.\n- [ ] User identity is properly resolved.\n- [ ] PII fields are handled according to consent preferences.\n\n---\n\n## Open Questions\nWhat additional user engagement metrics should be tracked post-upgrade?\nAre there any specific validation rules for the payment method?",
+    "status": "draft",
+    "comments": [
+      {
+        "id": "6c34fc5e-9929-48f0-bf21-c8bd71ed87f0",
+        "author": "system",
+        "text": "Regenerated with clarifications",
+        "createdAt": "2025-11-29T04:58:30.907Z"
+      }
+    ],
+    "createdAt": "2025-11-29T04:58:30.907Z",
+    "updatedAt": "2025-11-29T04:58:30.907Z"
+  },
+  {
+    "id": "4a83c364-edd7-49a8-b9dc-03923448c9fe",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Track Cart Additions Without Purchase",
+        "summary": "This tracking requirement aims to capture events when users add products to their cart but do not complete the purchase. This data will help analyze user behavior and improve conversion rates.",
+        "requestor": null,
+        "submitted_at": "2025-12-01T06:48:12.950Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Add to Cart",
+          "description": "Captures when a user adds a product to their shopping cart without completing the purchase.",
+          "trigger": "User clicks 'Add to Cart' button for a product",
+          "properties": [
+            {
+              "name": "item_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product identifier"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "product_name",
+              "type": "string",
+              "required": true,
+              "description": "Name of the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product name"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "price",
+              "type": "number",
+              "required": true,
+              "description": "Price of the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product price"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "number",
+              "required": true,
+              "description": "Quantity of the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains quantity information"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "category",
+              "type": "string",
+              "required": true,
+              "description": "Category of the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product category"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "Time when the product was added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains timestamp of the event"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "device_id",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID is the primary key linked to account. Email used for marketing communications. Device ID for cross-device tracking."
+          },
+          "business_rules": [
+            "User must be logged in or identified as an anonymous user",
+            "Quantity must be greater than zero"
+          ],
+          "technical_rules": [
+            "Item ID must be a valid product identifier",
+            "Timestamp must be in ISO 8601 format"
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [
+              "Monetary fields detected but no currency field - add currency (e.g., \"USD\")"
+            ],
+            "overall_score": 95
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Segment",
+          "requirements": [
+            "Must map to tracking plan schema",
+            "Real-time streaming required"
+          ],
+          "notes": "Primary CDP for event collection"
+        },
+        {
+          "name": "Google Analytics",
+          "requirements": [
+            "E-commerce events must follow GA4 schema"
+          ],
+          "notes": "For marketing attribution"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user completes the action",
+        "All required properties are captured and sent to destinations",
+        "User identity is properly resolved",
+        "PII fields are handled according to consent preferences"
+      ],
+      "open_questions": [
+        "Should we capture the product price at the time of addition or defer to a product catalog lookup?",
+        "What specific actions should trigger follow-up notifications or recommendations for users who added items to their cart but did not purchase?",
+        "Is there a limit on the number of items a user can add to their cart?"
+      ]
+    },
+    "markdownSpec": "# Track Cart Additions Without Purchase\n\n## Summary\nThis tracking requirement aims to capture events when users add products to their cart but do not complete the purchase. It will help in understanding user behavior and optimizing the conversion funnel.\n\n---\n\n## Events\n\n### Add to Cart\n**Trigger:** User clicks 'Add to Cart' button for a product\n\n**Description:** Captures when a user adds a product to their shopping cart without completing the purchase.\n\n**Properties**\n| Property      | Type    | Required | Description                                          |\n|---------------|---------|----------|------------------------------------------------------|\n| item_id      | string  | true     | Unique identifier for the product being added to the cart |\n| product_name  | string  | true     | Name of the product being added to the cart         |\n| price         | number  | true     | Price of the product being added to the cart        |\n| quantity      | number  | true     | Quantity of the product being added to the cart     |\n| category      | string  | false    | Category of the product being added to the cart     |\n| timestamp     | string  | true     | Time when the product was added to the cart         |\n\n**Identity**\n| Role     | Identifier                      | Notes                                                                 |\n|----------|---------------------------------|-----------------------------------------------------------------------|\n| Primary  | user_id                         | User ID is the primary key linked to account.                        |\n| Secondary| email, device_id, session_id   | Email used for marketing communications. Device ID for cross-device tracking. |\n\n**PII & Consent**\n| Field        | PII Level | Consent Required |\n|--------------|-----------|------------------|\n| item_id     | none      | No               |\n| product_name | none      | No               |\n| price        | none      | No               |\n| quantity     | none      | No               |\n| category     | none      | No               |\n| timestamp    | none      | No               |\n\n---\n\n## Business Rules\n- User must be logged in or identified as an anonymous user\n- Product must be available in stock\n\n## Technical Rules\n- Item ID must be a valid product identifier\n- Quantity must be a positive integer\n\n---\n\n## Destinations\n| Destination       | Requirements                                          |\n|-------------------|------------------------------------------------------|\n| Segment           | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics   | E-commerce events must follow GA4 schema             |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the action\n- [ ] All required properties are captured and sent to destinations\n- [ ] User identity is properly resolved\n- [ ] PII fields are handled according to consent preferences\n\n---\n\n## Open Questions\n- Should we capture the product price at the time of addition or defer to a product catalog lookup?\n- What is the maximum quantity allowed for items in the cart?\n- Should cart additions trigger any downstream notifications or recommendations?",
+    "status": "draft",
+    "comments": [],
+    "createdAt": "2025-12-01T06:48:53.986Z",
+    "updatedAt": "2025-12-06T20:01:48.033Z"
+  },
+  {
+    "id": "36963607-6de1-42d1-95cc-3ad7d1131e0d",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Track Add to Cart Events",
+        "summary": "This requirement captures events when users add items to their shopping cart. It aims to track user interactions and improve the shopping experience.",
+        "requestor": null,
+        "submitted_at": "2025-12-05T17:12:36.694Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Add to Cart",
+          "description": "Captures when a user adds an item to their shopping cart.",
+          "trigger": "User clicks the 'Add to Cart' button for a product.",
+          "properties": [
+            {
+              "name": "item_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the product being added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product identification information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "number",
+              "required": true,
+              "description": "Number of units of the product being added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains quantity information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the event occurred.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains event timing information."
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "device_id",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID is the primary key linked to account. Email used for marketing communications. Device ID for cross-device tracking."
+          },
+          "business_rules": [
+            "User must be logged in or identified as a guest.",
+            "Quantity must be greater than zero."
+          ],
+          "technical_rules": [
+            "Item ID must be a valid product identifier.",
+            "Timestamp must be in ISO 8601 format."
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [],
+            "overall_score": 100
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Segment",
+          "requirements": [
+            "Must map to tracking plan schema",
+            "Real-time streaming required"
+          ],
+          "notes": "Primary CDP for event collection"
+        },
+        {
+          "name": "Google Analytics",
+          "requirements": [
+            "E-commerce events must follow GA4 schema"
+          ],
+          "notes": "For marketing attribution"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user completes the action",
+        "All required properties are captured and sent to destinations",
+        "User identity is properly resolved",
+        "PII fields are handled according to consent preferences"
+      ],
+      "open_questions": [
+        "Should we capture the product price at the time of addition or defer to a product catalog lookup?",
+        "What is the maximum quantity allowed for a single item in the cart?",
+        "Should adding an item to the cart trigger any downstream notifications or recommendations?"
+      ]
+    },
+    "markdownSpec": "# Track Add to Cart Events\n\n## Summary\nThis requirement captures events when users add items to their shopping cart. It aims to track user interactions for better understanding of shopping behavior and inventory management.\n\n---\n\n## Events\n\n### Add to Cart\n**Trigger:** User clicks 'Add to Cart' button on a product page.\n\n**Description:** Captures when a user adds a product to their shopping cart.\n\n**Properties**\n| Property      | Type    | Required | Description                                                   |\n|---------------|---------|----------|---------------------------------------------------------------|\n| item_id      | string  | true     | Unique identifier for the product being added to the cart.   |\n| product_name  | string  | true     | Name of the product being added to the cart.                  |\n| price         | number  | true     | Price of the product at the time of addition.                 |\n| quantity      | number  | true     | Quantity of the product being added to the cart.              |\n| category      | string  | false    | Category of the product being added to the cart.              |\n| timestamp     | string  | true     | Time when the product was added to the cart.                  |\n\n**Identity**\n| Role     | Identifier                    | Notes                                                                 |\n|----------|-------------------------------|-----------------------------------------------------------------------|\n| Primary  | user_id                       | User ID is the primary key linked to account.                        |\n| Secondary| email, device_id, session_id  | Email used for marketing communications. Device ID for cross-device tracking. |\n\n**PII & Consent**\n| Field        | PII Level | Consent Required |\n|--------------|-----------|------------------|\n| item_id      | none      | No               |\n| product_name  | none      | No               |\n| price         | none      | No               |\n| quantity      | none      | No               |\n| category      | none      | No               |\n| timestamp     | none      | No               |\n\n---\n\n## Business Rules\n- User must be logged in or identified as a guest.\n- Quantity must be greater than zero.\n\n## Technical Rules\n- Item ID must be a valid product identifier.\n- Price must be a positive number.\n\n---\n\n## Destinations\n| Destination       | Requirements                                         |\n|-------------------|------------------------------------------------------|\n| Segment           | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics   | E-commerce events must follow GA4 schema             |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the action\n- [ ] All required properties are captured and sent to destinations\n- [ ] User identity is properly resolved\n- [ ] PII fields are handled according to consent preferences\n\n---\n\n## Open Questions\n- Should we capture the product price at the time of addition or defer to a product catalog lookup?\n- What is the maximum quantity allowed for a single product in the cart?\n- Should adding to cart trigger any downstream notifications or recommendations?",
+    "status": "approved",
+    "comments": [],
+    "createdAt": "2025-12-05T17:13:02.578Z",
+    "updatedAt": "2025-12-06T19:52:32.525Z"
+  },
+  {
+    "id": "87ce11aa-6fb8-45ff-9253-d7449340228c",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Add to Cart Event Specification",
+        "summary": "This specification outlines the requirements for tracking the 'Add to Cart' event, capturing user interactions when items are added to their shopping cart. It includes necessary properties, identity assumptions, and consent implications.",
+        "requestor": null,
+        "submitted_at": "2025-12-05T17:25:12.768Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Add to Cart",
+          "description": "Captures when a user adds an item to their shopping cart.",
+          "trigger": "User clicks 'Add to Cart' button for a product.",
+          "properties": [
+            {
+              "name": "item_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the product being added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product identifier"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "product_name",
+              "type": "string",
+              "required": true,
+              "description": "Name of the product being added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product name"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "price",
+              "type": "number",
+              "required": true,
+              "description": "Price of the product at the time of addition.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product price"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "number",
+              "required": true,
+              "description": "Number of units of the product being added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains quantity of product"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "category",
+              "type": "string",
+              "required": false,
+              "description": "Category of the product being added to the cart.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product category"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the event occurred.",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains event timestamp"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "device_id",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID is the primary key linked to account. Email used for marketing communications. Device ID for cross-device tracking."
+          },
+          "business_rules": [
+            "User must be logged in or identified as an anonymous user.",
+            "Quantity must be greater than zero."
+          ],
+          "technical_rules": [
+            "Item ID must be a valid product identifier.",
+            "Price must be a positive number."
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [
+              "Monetary fields detected but no currency field - add currency (e.g., \"USD\")"
+            ],
+            "overall_score": 95
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Segment",
+          "requirements": [
+            "Must map to tracking plan schema",
+            "Real-time streaming required"
+          ],
+          "notes": "Primary CDP for event collection"
+        },
+        {
+          "name": "Google Analytics",
+          "requirements": [
+            "E-commerce events must follow GA4 schema"
+          ],
+          "notes": "For marketing attribution"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user completes the action",
+        "All required properties are captured and sent to destinations",
+        "User identity is properly resolved",
+        "PII fields are handled according to consent preferences"
+      ],
+      "open_questions": [
+        "Should we capture the product price at the time of addition or defer to a product catalog lookup?",
+        "What is the maximum quantity allowed for a single product in the cart?",
+        "Should 'Add to Cart' trigger any downstream notifications or recommendations?"
+      ]
+    },
+    "markdownSpec": "# Add to Cart Event Specification\n\n## Summary\nThis specification outlines the requirements for tracking the 'Add to Cart' event, capturing essential product and user information when a user adds an item to their shopping cart.\n\n---\n\n## Events\n\n### Add to Cart\n**Trigger:** User clicks 'Add to Cart' button for a product.\n\n**Description:** Captures the action of a user adding a product to their shopping cart.\n\n**Properties**\n| Property       | Type    | Required | Description                                               |\n|----------------|---------|----------|-----------------------------------------------------------|\n| item_id        | string  | true     | Unique identifier for the product being added to the cart. |\n| product_name   | string  | true     | Name of the product being added to the cart.              |\n| price          | number  | true     | Price of the product at the time of addition.             |\n| quantity       | number  | true     | Number of units of the product being added to the cart.   |\n| category       | string  | false    | Category of the product being added to the cart.          |\n| timestamp      | string  | true     | The time at which the event occurred.                     |\n\n**Identity**\n| Role     | Identifier                     | Notes                                                                                   |\n|----------|--------------------------------|-----------------------------------------------------------------------------------------|\n| Primary  | user_id                        | User ID is the primary key linked to account.                                          |\n| Secondary| email, device_id, session_id   | Email used for marketing communications. Device ID for cross-device tracking.          |\n\n**PII & Consent**\n| Field        | PII Level | Consent Required |\n|--------------|-----------|------------------|\n| item_id      | none      | No               |\n| product_name | none      | No               |\n| price        | none      | No               |\n| quantity     | none      | No               |\n| category     | none      | No               |\n| timestamp    | none      | No               |\n\n---\n\n## Business Rules\n- Quantity must be greater than zero.\n- Item ID must correspond to an existing product.\n\n## Technical Rules\n- Item ID must be a valid format as defined in the product catalog.\n- Price must be a positive number.\n\n---\n\n## Destinations\n| Destination      | Requirements                                           |\n|------------------|-------------------------------------------------------|\n| Segment          | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics  | E-commerce events must follow GA4 schema              |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the action.\n- [ ] All required properties are captured and sent to destinations.\n- [ ] User identity is properly resolved.\n- [ ] PII fields are handled according to consent preferences.\n\n---\n\n## Open Questions\n- Should we capture the product price at the time of addition or defer to a product catalog lookup?\n- What is the maximum number of items allowed in the cart?\n- Should 'Add to Cart' trigger any downstream notifications or recommendations?",
+    "status": "approved",
+    "comments": [],
+    "createdAt": "2025-12-05T17:25:51.395Z",
+    "updatedAt": "2025-12-06T19:52:02.993Z"
+  },
+  {
+    "id": "0bfc4b1c-0ca3-4e7a-9895-4d26f62fd8c4",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "User Signup and Cart Addition Tracking",
+        "summary": "This tracking requirement captures user signup events followed by product addition to the cart. It aims to monitor user engagement from the signup process through to cart interactions.",
+        "requestor": null,
+        "submitted_at": "2025-12-06T19:02:16.873Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Signup Started",
+          "description": "Captures when a user initiates the signup process.",
+          "trigger": "User clicks on the signup button",
+          "properties": [
+            {
+              "name": "user_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the user",
+              "pii": {
+                "classification": "low",
+                "reason": "Contains user ID"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the signup started",
+              "pii": {
+                "classification": "none",
+                "reason": "Timestamp does not contain PII"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID links to account, email used for marketing."
+          },
+          "business_rules": [],
+          "technical_rules": [],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [],
+            "overall_score": 100
+          }
+        },
+        {
+          "name": "Product Added to Cart",
+          "description": "Captures when a user adds a product to their cart.",
+          "trigger": "User clicks on the add to cart button",
+          "properties": [
+            {
+              "name": "item_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the product",
+              "pii": {
+                "classification": "none",
+                "reason": "Product ID does not contain PII"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "product_name",
+              "type": "string",
+              "required": true,
+              "description": "Name of the product added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Product name does not contain PII"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "price",
+              "type": "number",
+              "required": true,
+              "description": "Price of the product at the time of addition",
+              "pii": {
+                "classification": "none",
+                "reason": "Price does not contain PII"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "number",
+              "required": true,
+              "description": "Quantity of the product added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Quantity does not contain PII"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "The time when the product was added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Timestamp does not contain PII"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID links to account, email used for marketing."
+          },
+          "business_rules": [
+            "Quantity must be greater than zero"
+          ],
+          "technical_rules": [],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [
+              "Monetary fields detected but no currency field - add currency (e.g., \"USD\")"
+            ],
+            "overall_score": 95
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Segment",
+          "requirements": [
+            "Must map to tracking plan schema",
+            "Real-time streaming required"
+          ],
+          "notes": "Primary CDP for event collection"
+        },
+        {
+          "name": "Google Analytics",
+          "requirements": [
+            "User engagement events must follow GA4 schema"
+          ],
+          "notes": "For marketing attribution"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user completes the action",
+        "All required properties are captured and sent to destinations",
+        "User identity is properly resolved"
+      ],
+      "open_questions": [
+        "What specific user identifiers should be captured during the signup process?",
+        "Should we capture the product price at the time of addition or defer to a product catalog lookup?",
+        "Are there any specific business rules for the signup process?"
+      ]
+    },
+    "markdownSpec": "# User Signup and Cart Addition Tracking\n\n## Summary\nThis tracking requirement captures user signup and subsequent actions of adding products to the cart. It aims to understand user behavior from the initial signup to product selection.\n\n---\n\n## Events\n\n### Signup Started\n**Trigger:** User clicks on the signup button\n\n**Description:** Captures when a user initiates the signup process on the website.\n\n**Properties**\n| Property   | Type   | Required | Description                             |\n|------------|--------|----------|-----------------------------------------|\n| timestamp  | string | true     | The time when the signup started        |\n\n**Identity**\n| Role     | Identifier | Notes                                                                 |\n|----------|------------|-----------------------------------------------------------------------|\n| Primary  | user_id    | User ID is the primary key linked to account. Email used for marketing communications. |\n| Secondary| email, session_id | Explain secondary identifiers                                   |\n\n**PII & Consent**\n| Field     | PII Level | Consent Required |\n|-----------|-----------|------------------|\n| timestamp | none      | No               |\n\n---\n\n## Business Rules\n- \n\n## Technical Rules\n- \n\n---\n\n## Destinations\n| Destination       | Requirements                                         |\n|-------------------|------------------------------------------------------|\n| Segment           | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics   | E-commerce events must follow GA4 schema            |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the action\n- [ ] All required properties are captured and sent to destinations\n- [ ] User identity is properly resolved\n- [ ] PII fields are handled according to consent preferences\n\n---\n\n## Open Questions\nWhat specific user identifiers should be captured during the signup process?\nShould we track additional properties for the 'Product Added to Cart' event, such as category or discount?\nIs there a need to capture the user's location or device information during signup?\n\n---\n\n### Product Added to Cart\n**Trigger:** User clicks on the 'Add to Cart' button\n\n**Description:** Captures when a user adds a product to their shopping cart.\n\n**Properties**\n| Property      | Type    | Required | Description                             |\n|---------------|---------|----------|-----------------------------------------|\n| item_id       | string  | true     | Unique identifier for the product being added |\n| product_name  | string  | true     | Name of the product added to the cart   |\n| price         | number  | true     | Price of the product at the time of addition |\n| quantity      | number  | true     | Quantity of the product added to the cart |\n| timestamp     | string  | true     | The time when the product was added to the cart |\n\n**Identity**\n| Role     | Identifier | Notes                                                                 |\n|----------|------------|-----------------------------------------------------------------------|\n| Primary  | user_id    | User ID is the primary key linked to account. Email used for marketing communications. |\n| Secondary| email, session_id | Explain secondary identifiers                                   |\n\n**PII & Consent**\n| Field      | PII Level | Consent Required |\n|------------|-----------|------------------|\n| item_id    | none      | No               |\n| product_name| none     | No               |\n| price      | none      | No               |\n| quantity   | none      | No               |\n| timestamp  | none      | No               |\n\n---\n\n## Business Rules\n- Quantity must be greater than zero\n\n## Technical Rules\n- Monetary fields detected but no currency field - add currency (e.g., \"USD\")\n\n---\n\n## Destinations\n| Destination       | Requirements                                         |\n|-------------------|------------------------------------------------------|\n| Segment           | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics   | E-commerce events must follow GA4 schema            |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the action\n- [ ] All required properties are captured and sent to destinations\n- [ ] User identity is properly resolved\n- [ ] PII fields are handled according to consent preferences\n\n---\n\n## Open Questions\nWhat specific user identifiers should be captured during the signup process?\nShould we track additional properties for the 'Product Added to Cart' event, such as category or discount?\nIs there a need to capture the user's location or device information during signup?",
+    "status": "validated",
+    "comments": [],
+    "createdAt": "2025-12-06T19:03:17.742Z",
+    "updatedAt": "2025-12-06T19:09:47.391Z"
+  },
+  {
+    "id": "4754c52a-d98d-4540-8e1d-466c4cc39c2c",
+    "canonicalSpec": {
+      "metadata": {
+        "title": "Track Cart Additions Without Purchase",
+        "summary": "This tracking requirement aims to capture events when users add products to their cart but do not complete the purchase. This data will help analyze user behavior and improve conversion rates.",
+        "requestor": null,
+        "submitted_at": "2025-12-01T06:48:12.950Z",
+        "status": "draft"
+      },
+      "events": [
+        {
+          "name": "Add to Cart",
+          "description": "Captures when a user adds a product to their shopping cart without completing the purchase.",
+          "trigger": "User clicks 'Add to Cart' button for a product",
+          "properties": [
+            {
+              "name": "item_id",
+              "type": "string",
+              "required": true,
+              "description": "Unique identifier for the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product identifier"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "product_name",
+              "type": "string",
+              "required": true,
+              "description": "Name of the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product name"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "price",
+              "type": "number",
+              "required": true,
+              "description": "Price of the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product price"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "number",
+              "required": true,
+              "description": "Quantity of the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains quantity information"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "category",
+              "type": "string",
+              "required": true,
+              "description": "Category of the product being added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains product category"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": "string",
+              "required": true,
+              "description": "Time when the product was added to the cart",
+              "pii": {
+                "classification": "none",
+                "reason": "Contains timestamp of the event"
+              },
+              "consent": {
+                "required": false,
+                "policy_group": null
+              }
+            }
+          ],
+          "identity": {
+            "primary": "user_id",
+            "secondary": [
+              "email",
+              "device_id",
+              "session_id"
+            ],
+            "stitching_assumptions": "User ID is the primary key linked to account. Email used for marketing communications. Device ID for cross-device tracking."
+          },
+          "business_rules": [
+            "User must be logged in or identified as an anonymous user",
+            "Quantity must be greater than zero"
+          ],
+          "technical_rules": [
+            "Item ID must be a valid product identifier",
+            "Timestamp must be in ISO 8601 format"
+          ],
+          "validation": {
+            "naming": [],
+            "fields": [],
+            "identity": [],
+            "consent": [],
+            "governance": [
+              "Monetary fields detected but no currency field - add currency (e.g., \"USD\")"
+            ],
+            "overall_score": 95
+          }
+        }
+      ],
+      "destinations": [
+        {
+          "name": "Segment",
+          "requirements": [
+            "Must map to tracking plan schema",
+            "Real-time streaming required"
+          ],
+          "notes": "Primary CDP for event collection"
+        },
+        {
+          "name": "Google Analytics",
+          "requirements": [
+            "E-commerce events must follow GA4 schema"
+          ],
+          "notes": "For marketing attribution"
+        }
+      ],
+      "acceptance_criteria": [
+        "Event fires correctly when user completes the action",
+        "All required properties are captured and sent to destinations",
+        "User identity is properly resolved",
+        "PII fields are handled according to consent preferences"
+      ],
+      "open_questions": [
+        "Should we capture the product price at the time of addition or defer to a product catalog lookup?",
+        "What specific actions should trigger follow-up notifications or recommendations for users who added items to their cart but did not purchase?",
+        "Is there a limit on the number of items a user can add to their cart?"
+      ]
+    },
+    "markdownSpec": "# Track Cart Additions Without Purchase\n\n## Summary\nThis tracking requirement aims to capture events when users add products to their cart but do not complete the purchase. It will help in understanding user behavior and optimizing the conversion funnel.\n\n---\n\n## Events\n\n### Add to Cart\n**Trigger:** User clicks 'Add to Cart' button for a product\n\n**Description:** Captures when a user adds a product to their shopping cart without completing the purchase.\n\n**Properties**\n| Property      | Type    | Required | Description                                          |\n|---------------|---------|----------|------------------------------------------------------|\n| item_id      | string  | true     | Unique identifier for the product being added to the cart |\n| product_name  | string  | true     | Name of the product being added to the cart         |\n| price         | number  | true     | Price of the product being added to the cart        |\n| quantity      | number  | true     | Quantity of the product being added to the cart     |\n| category      | string  | false    | Category of the product being added to the cart     |\n| timestamp     | string  | true     | Time when the product was added to the cart         |\n\n**Identity**\n| Role     | Identifier                      | Notes                                                                 |\n|----------|---------------------------------|-----------------------------------------------------------------------|\n| Primary  | user_id                         | User ID is the primary key linked to account.                        |\n| Secondary| email, device_id, session_id   | Email used for marketing communications. Device ID for cross-device tracking. |\n\n**PII & Consent**\n| Field        | PII Level | Consent Required |\n|--------------|-----------|------------------|\n| item_id     | none      | No               |\n| product_name | none      | No               |\n| price        | none      | No               |\n| quantity     | none      | No               |\n| category     | none      | No               |\n| timestamp    | none      | No               |\n\n---\n\n## Business Rules\n- User must be logged in or identified as an anonymous user\n- Product must be available in stock\n\n## Technical Rules\n- Item ID must be a valid product identifier\n- Quantity must be a positive integer\n\n---\n\n## Destinations\n| Destination       | Requirements                                          |\n|-------------------|------------------------------------------------------|\n| Segment           | Must map to tracking plan schema, Real-time streaming required |\n| Google Analytics   | E-commerce events must follow GA4 schema             |\n\n## Acceptance Criteria\n- [ ] Event fires correctly when user completes the action\n- [ ] All required properties are captured and sent to destinations\n- [ ] User identity is properly resolved\n- [ ] PII fields are handled according to consent preferences\n\n---\n\n## Open Questions\n- Should we capture the product price at the time of addition or defer to a product catalog lookup?\n- What is the maximum quantity allowed for items in the cart?\n- Should cart additions trigger any downstream notifications or recommendations?",
+    "status": "pending_approval",
+    "comments": [
+      {
+        "id": "72248d8b-a3a8-424a-8fac-d7aa8014bf39",
+        "author": "Sam User",
+        "text": "🔔 Approval requested by Sam User",
+        "createdAt": "2025-12-06T20:02:05.698Z"
+      }
+    ],
+    "createdAt": "2025-12-06T20:02:05.698Z",
+    "updatedAt": "2025-12-06T20:14:06.295Z"
+  }
+]
