@@ -687,6 +687,7 @@ const LoadingAnimation = ({ step = 0 }: { step?: number }) => {
 // ============================================================================
 // VALIDATION ISSUES LIST COMPONENT
 // ============================================================================
+// Note: currently unused; keep for future use but satisfy TS unused checks
 const ValidationIssuesList = ({ validation }: { validation: any }) => {
   if (!validation) return null;
 
@@ -744,6 +745,7 @@ const ValidationIssuesList = ({ validation }: { validation: any }) => {
 // ============================================================================
 // SIMPLE MARKDOWN RENDERER (no external dependencies)
 // ============================================================================
+// Note: currently unused; keep for future use but satisfy TS unused checks
 const SimpleMarkdown = ({ content, darkMode = false }: { content: string; darkMode?: boolean }) => {
   // Dynamic colors based on dark mode
   const colors = darkMode ? {
@@ -765,7 +767,7 @@ const SimpleMarkdown = ({ content, darkMode = false }: { content: string; darkMo
   };
 
   // Format inline text (bold, code, etc.) - defined outside loop so it can be reused
-  const formatInline = (text: string): (string | JSX.Element)[] => {
+  const formatInline = (text: string): (string | React.ReactElement)[] => {
     const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
     return parts.map((part, i) => {
       if (part.startsWith('**') && part.endsWith('**')) {
@@ -787,7 +789,7 @@ const SimpleMarkdown = ({ content, darkMode = false }: { content: string; darkMo
 
   const renderMarkdown = (text: string) => {
     const lines = text.split('\n');
-    const elements: JSX.Element[] = [];
+    const elements: React.ReactElement[] = [];
     let inTable = false;
     let tableRows: string[][] = [];
     let inCodeBlock = false;
@@ -885,7 +887,7 @@ const SimpleMarkdown = ({ content, darkMode = false }: { content: string; darkMo
       }
     };
 
-    lines.forEach((line, idx) => {
+    lines.forEach((line) => {
       // Code blocks
       if (line.startsWith('```')) {
         if (inCodeBlock) {
@@ -1172,7 +1174,6 @@ function App() {
   const [activeNav, setActiveNav] = useState<"dashboard" | "specs" | "agent" | "settings">("agent");
 
   // Jira
-  const [jiraCreating, setJiraCreating] = useState(false);
   const [selectedExportPersona, setSelectedExportPersona] = useState<string>("engineer");
   const [expandedSpecSections, setExpandedSpecSections] = useState<Set<string>>(new Set(["summary"]));
   
@@ -1188,13 +1189,6 @@ function App() {
     });
   };
   
-  const expandAllSections = () => {
-    setExpandedSpecSections(new Set(["summary", "events", "destinations", "consent", "acceptance", "questions", "dependencies"]));
-  };
-  
-  const collapseAllSections = () => {
-    setExpandedSpecSections(new Set());
-  };
   const [jiraIssueUrl, setJiraIssueUrl] = useState<string | null>(null);
 
   // Settings – Slack
@@ -1680,7 +1674,7 @@ Please incorporate these answers into the specification and remove the answered 
                 canonicalSpec: canonicalData.canonicalSpec,
                 status: "draft",
                 commentText: `📝 Spec regenerated with clarifications:\n\n${answersContext}`,
-                author: currentUser.name,
+                author: currentUser?.name || "Unknown",
                 markdownSpec: specData.spec,
                 title: canonicalData.canonicalSpec?.metadata?.title || "Untitled Spec",
                 createdBy: currentUser?.name || "Unknown",
