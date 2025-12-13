@@ -1058,18 +1058,45 @@ const SimpleMarkdown = ({ content, darkMode = false }: { content: string; darkMo
 };
 
 // ============================================================================
-// CDP INDICATOR COMPONENT (colored squares instead of emojis)
+// DESTINATION INDICATOR COMPONENT (colored squares for destinations)
 // ============================================================================
 const CdpIndicator = ({ type, size = 16 }: { type: string; size?: number }) => {
-  const cdpConfig: Record<string, { color: string; letter: string }> = {
+  const destinationConfig: Record<string, { color: string; letter: string }> = {
+    // Destination types (categories)
+    analytics: { color: "#4285F4", letter: "A" },
+    advertising: { color: "#EA4335", letter: "Ad" },
+    crm: { color: "#00A1E0", letter: "C" },
+    email: { color: "#FF6B35", letter: "E" },
+    data_warehouse: { color: "#34A853", letter: "DW" },
+    customer_support: { color: "#7C3AED", letter: "CS" },
+    personalization: { color: "#EC4899", letter: "P" },
+    attribution: { color: "#F59E0B", letter: "At" },
+    // Specific platforms
+    "google analytics": { color: "#F9AB00", letter: "GA" },
+    "google ads": { color: "#4285F4", letter: "G" },
+    "facebook ads": { color: "#1877F2", letter: "FB" },
+    "tiktok ads": { color: "#000000", letter: "TT" },
+    mixpanel: { color: "#7856FF", letter: "M" },
+    amplitude: { color: "#1E61F0", letter: "Am" },
+    heap: { color: "#FF6B6B", letter: "H" },
+    salesforce: { color: "#00A1E0", letter: "SF" },
+    hubspot: { color: "#FF7A59", letter: "HS" },
+    mailchimp: { color: "#FFE01B", letter: "MC" },
+    klaviyo: { color: "#000000", letter: "K" },
+    braze: { color: "#000000", letter: "B" },
+    bigquery: { color: "#4285F4", letter: "BQ" },
+    snowflake: { color: "#29B5E8", letter: "SF" },
+    redshift: { color: "#8C4FFF", letter: "RS" },
+    zendesk: { color: "#03363D", letter: "Z" },
+    intercom: { color: "#6AFDEF", letter: "I" },
     segment: { color: "#52BD95", letter: "S" },
     tealium: { color: "#00B4E6", letter: "T" },
     mparticle: { color: "#FF6B35", letter: "m" },
-    salesforce: { color: "#00A1E0", letter: "SF" },
     adobe: { color: "#FA0F00", letter: "A" },
   };
 
-  const config = cdpConfig[type] || { color: "#94a3b8", letter: type?.charAt(0)?.toUpperCase() || "?" };
+  const lowerType = type?.toLowerCase() || "";
+  const config = destinationConfig[lowerType] || { color: "#94a3b8", letter: type?.charAt(0)?.toUpperCase() || "?" };
 
   return (
     <div
@@ -3950,27 +3977,45 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                     </button>
                     {expandedSpecSections.has("destinations") && (
                       <div style={{ padding: "0 16px 16px" }}>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                           {canonical.destinations.map((dest: any, i: number) => {
                             const destName = typeof dest === 'string' ? dest : dest.name;
+                            const destType = typeof dest === 'string' ? 'analytics' : dest.type;
+                            const destPurpose = typeof dest === 'string' ? '' : dest.purpose;
                             return (
                             <div
                               key={i}
                               style={{
-                                padding: "10px 16px",
+                                padding: "12px 16px",
                                 backgroundColor: theme.colors.surface,
                                 border: `1px solid ${theme.colors.border}`,
                                 borderRadius: tokens.radius.md,
-                                fontSize: 13,
-                                fontWeight: 500,
-                                color: theme.colors.text.primary,
                                 display: "flex",
                                 alignItems: "center",
-                                gap: 8,
+                                gap: 12,
                               }}
                             >
-                              <CdpIndicator type={destName?.toLowerCase()} />
-                              {destName}
+                              <CdpIndicator type={destName?.toLowerCase()} size={28} />
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: 14, fontWeight: 600, color: theme.colors.text.primary }}>
+                                  {destName}
+                                </div>
+                                {destPurpose && (
+                                  <div style={{ fontSize: 12, color: theme.colors.text.muted, marginTop: 2 }}>
+                                    {destPurpose}
+                                  </div>
+                                )}
+                              </div>
+                              <span style={{
+                                padding: "4px 8px",
+                                borderRadius: 12,
+                                backgroundColor: theme.colors.background,
+                                fontSize: 11,
+                                color: theme.colors.text.muted,
+                                textTransform: "capitalize",
+                              }}>
+                                {destType?.replace(/_/g, ' ')}
+                              </span>
                             </div>
                           )})}
                         </div>

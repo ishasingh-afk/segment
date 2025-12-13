@@ -99,7 +99,13 @@ Return a JSON object with this exact structure:
       "validation": { "overall_score": 85 }     // 0-100 based on spec completeness
     }
   ],
-  "destinations": ["segment", "tealium", "mparticle"],   // lowercase slugs
+  "destinations": [                             // WHERE the data should be sent based on use case
+    {
+      "name": "Google Analytics",               // Human-readable destination name
+      "type": "analytics",                      // Category: analytics, advertising, crm, email, data_warehouse, etc.
+      "purpose": "Track user behavior and conversion funnels"  // Why send data here
+    }
+  ],
   "acceptance_criteria": [                      // Specific, testable criteria
     "Specific, measurable acceptance criterion with expected outcome"
   ],
@@ -144,7 +150,21 @@ CRITICAL RULES FOR QUALITY:
    - Ask about integration requirements
    - Examples: "Should abandoned cart events fire for guest users?", "What's the retry policy for failed event delivery?"
 
-7. DESTINATIONS: lowercase slugs from: segment, tealium, mparticle, salesforce, adobe (choose 2-3)
+7. DESTINATIONS (choose 2-4 relevant to the use case):
+   - Infer destinations based on what the tracking is for
+   - Common destination types and examples:
+     * analytics: Google Analytics, Mixpanel, Amplitude, Heap
+     * advertising: Google Ads, Facebook Ads, TikTok Ads, LinkedIn Ads
+     * crm: Salesforce, HubSpot, Pipedrive
+     * email: Mailchimp, Klaviyo, Braze, Iterable
+     * data_warehouse: BigQuery, Snowflake, Redshift
+     * customer_support: Zendesk, Intercom, Freshdesk
+     * personalization: Optimizely, Dynamic Yield
+     * attribution: AppsFlyer, Adjust, Branch
+   - For e-commerce/purchases → include advertising platforms for conversion tracking
+   - For user signups → include CRM and email marketing
+   - For product usage → include analytics and product analytics tools
+   - Each destination must have name, type, and purpose
 
 Return ONLY valid JSON (no markdown, no code fences).`;
 
@@ -156,10 +176,24 @@ export function normalizeCanonicalSpec(input: any): CanonicalSpec {
   const acceptance = Array.isArray(input?.acceptance_criteria) ? input.acceptance_criteria : [];
   const questions = Array.isArray(input?.open_questions) ? input.open_questions : [];
 
-  const safeDestinations =
-    destinations.length > 0
-      ? destinations.map((d: any) => String(d || "").toLowerCase().replace(/\s+/g, ""))
-      : ["segment", "tealium", "mparticle"];
+  // Handle both string destinations and object destinations
+  const safeDestinations = destinations.length > 0
+    ? destinations.map((d: any) => {
+        if (typeof d === 'string') {
+          // Legacy string format - convert to object
+          return { name: d, type: 'analytics', purpose: 'Data destination' };
+        }
+        // New object format
+        return {
+          name: d.name || 'Unknown',
+          type: d.type || 'analytics',
+          purpose: d.purpose || 'Data destination'
+        };
+      })
+    : [
+        { name: 'Google Analytics', type: 'analytics', purpose: 'Track user behavior and conversion metrics' },
+        { name: 'BigQuery', type: 'data_warehouse', purpose: 'Store raw event data for analysis' }
+      ];
 
   const normalizedEvents = events.map((evt: any, idx: number) => {
     const props = Array.isArray(evt?.properties) ? evt.properties : [];
