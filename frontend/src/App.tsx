@@ -1715,7 +1715,9 @@ Please incorporate these answers into the specification and remove the answered 
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/specpilot/spec/${idToLoad}`);
+      const res = await fetch(`${API_BASE}/api/specpilot/spec/${idToLoad}`, {
+        headers: { "X-Client-Id": CLIENT_ID },
+      });
       const data = await res.json();
 
       if (!data.ok || !data.stored) {
@@ -1992,7 +1994,9 @@ Please incorporate these answers into the specification and remove the answered 
   async function loadSpecList() {
     setSpecsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/specpilot/specs`);
+      const res = await fetch(`${API_BASE}/api/specpilot/specs`, {
+        headers: { "X-Client-Id": CLIENT_ID },
+      });
       const data = await res.json();
       if (data.ok) {
         setSpecList(data.specs || []);
