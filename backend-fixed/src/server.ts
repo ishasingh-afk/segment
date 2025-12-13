@@ -17,6 +17,22 @@ import { setSlackConfig, setJiraConfig, getConfig } from "./integrationStore.js"
 
 const app = express();
 
+// In-memory validation config per client (keep it simple for now)
+const validationConfigs: Map<string, any> = new Map();
+const defaultValidationConfig = {
+  naming: {
+    eventNameFormat: "Title Case",
+    propertyNameFormat: "snake_case",
+  },
+  requiredFields: {
+    allEvents: ["timestamp", "user_id"],
+    cartEvents: ["item_id", "quantity"],
+    purchaseEvents: ["order_id", "total", "currency"],
+  },
+  piiFields: ["email", "phone", "address", "ssn", "name", "first_name", "last_name"],
+  consentRequired: true,
+};
+
 // ---------- MIDDLEWARE ----------
 app.use(cors());
 app.use(express.json());
@@ -61,6 +77,38 @@ app.get("/health", (_req: Request, res: Response) => {
   res.json({ ok: true, timestamp: new Date().toISOString() });
 });
 
+// Fetch URL content (used by frontend context loader)
+app.post("/api/fetch-url", async (req: Request, res: Response) => {
+  try {
+    const { url } = req.body;
+    if (!url || typeof url !== "string") {
+      return res.status(400).json({ ok: false, error: "Missing url" });
+    }
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+      return res.status(400).json({ ok: false, error: "Only http/https URLs are allowed" });
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      return res.status(400).json({ ok: false, error: `Failed to fetch URL (status ${response.status})` });
+    }
+
+    const content = await response.text();
+    res.json({ ok: true, content });
+  } catch (err: any) {
+    console.error("Fetch URL error:", err);
+    res.status(500).json({ ok: false, error: "Failed to fetch URL" });
+  }
+});
+
+// Validation config (read-only default for now)
+app.get("/api/validation-config", (req: Request, res: Response) => {
+  const clientId = getClientId(req) || "default";
+  const config = validationConfigs.get(clientId) || defaultValidationConfig;
+  validationConfigs.set(clientId, config);
+  res.json({ ok: true, config });
+});
+
 // Generate markdown spec from intake
 app.post("/api/specpilot/intake", async (req: Request, res: Response) => {
   try {
@@ -91,6 +139,30 @@ app.post("/api/specpilot/canonical", async (req: Request, res: Response) => {
   }
 });
 
+// Generate adapters directly from intake (helper wrapper)
+app.post("/api/specpilot/adapters", async (req: Request, res: Response) => {
+  try {
+    const { input } = req.body;
+    if (!input) {
+      return res.status(400).json({ ok: false, error: "Missing input" });
+    }
+
+    const canonicalSpec = await generateCanonicalSpecFromIntake(input);
+    const segment = transformToSegmentTrackingPlan(canonicalSpec);
+    const tealium = transformToTealiumCdp(canonicalSpec);
+    const mparticle = transformToMParticleCdp(canonicalSpec);
+
+    res.json({
+      ok: true,
+      adapters: { segment, tealium, mparticle },
+      canonicalSpec,
+    });
+  } catch (err: any) {
+    console.error("Adapters from intake error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // Generate CDP adapters from canonical spec
 app.post("/api/specpilot/adapters-from-canonical", async (req: Request, res: Response) => {
   try {
@@ -111,6 +183,58 @@ app.post("/api/specpilot/adapters-from-canonical", async (req: Request, res: Res
     console.error("Adapters error:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
+});
+
+// Slack share a spec (uses stored Slack webhook)
+app.post("/api/specpilot/slack-share", async (req: Request, res: Response) => {
+  try {
+    const clientId = getClientId(req) || "default";
+    const { specId, text } = req.body;
+
+    if (!specId || !text) {
+      return res.status(400).json({ ok: false, error: "Missing specId or text" });
+    }
+
+    const cfg = getConfig(clientId);
+    const webhook = cfg?.slack?.webhookUrl;
+    if (!webhook) {
+      return res.status(400).json({ ok: false, error: "Slack is not configured" });
+    }
+
+    const payload = {
+      text: `Spec ${specId}\n${text}`,
+    };
+
+    const response = await fetch(webhook, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      return res.status(400).json({ ok: false, error: "Failed to send to Slack" });
+    }
+
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error("Slack share error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Jira ticket creation placeholder (does not call Jira Cloud APIs)
+app.post("/api/specpilot/jira-ticket/:specId", async (req: Request, res: Response) => {
+  const clientId = getClientId(req) || "default";
+  const { specId } = req.params;
+  const cfg = getConfig(clientId)?.jira;
+
+  if (!cfg) {
+    return res.status(400).json({ ok: false, error: "Jira is not configured" });
+  }
+
+  // In a real implementation we would call Jira here. For now, return a fake URL.
+  const issueUrl = `${cfg.baseUrl.replace(/\/$/, "")}/browse/${cfg.projectKey}-${specId}`;
+  res.json({ ok: true, issueUrl });
 });
 
 // Save spec
@@ -257,6 +381,42 @@ app.get("/api/specpilot/config", async (req: Request, res: Response) => {
     });
   } catch (err: any) {
     console.error("Get config error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Slack integration settings
+app.post("/api/integrations/slack", (req: Request, res: Response) => {
+  try {
+    const clientId = getClientId(req) || "default";
+    const { webhookUrl, channel } = req.body || {};
+
+    if (!webhookUrl) {
+      return res.status(400).json({ ok: false, error: "Missing webhookUrl" });
+    }
+
+    setSlackConfig(clientId, { webhookUrl, channel });
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error("Slack integration error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Jira integration settings
+app.post("/api/integrations/jira", (req: Request, res: Response) => {
+  try {
+    const clientId = getClientId(req) || "default";
+    const { baseUrl, email, apiToken, projectKey } = req.body || {};
+
+    if (!baseUrl || !email || !apiToken || !projectKey) {
+      return res.status(400).json({ ok: false, error: "Missing Jira config fields" });
+    }
+
+    setJiraConfig(clientId, { baseUrl, email, apiToken, projectKey });
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error("Jira integration error:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 });
