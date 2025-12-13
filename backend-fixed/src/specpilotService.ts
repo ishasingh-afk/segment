@@ -64,7 +64,7 @@ Return a JSON object with this exact structure:
   },
   "events": [
     {
-      "name": "Event Name",                     // concise, Title Case
+      "name": "Event Name",                     // concise, Title Case (max 4 words)
       "description": "What this event captures",
       "trigger": "When this event fires",
       "properties": [
@@ -92,7 +92,7 @@ Return a JSON object with this exact structure:
 
 Rules:
 - Generate 3-6 events that cover the end-to-end user journey.
-- Use concise, implementation-ready names and triggers.
+- Use concise, implementation-ready names and triggers (event names max 4 words, Title Case).
 - Every event must have at least 3 properties and at least 1 required property.
 - Provide at least 2 acceptance_criteria and at least 2 open_questions.
 - Destinations must be lowercase slugs from: segment, tealium, mparticle, salesforce, adobe (choose at least two).
@@ -181,7 +181,23 @@ Generate 3-6 events covering the complete user journey. Return only valid JSON.`
   cleaned = cleaned.trim();
 
   try {
-    return JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned);
+
+    // Minimal guards to keep frontend consistent
+    if (!Array.isArray(parsed.destinations) || parsed.destinations.length === 0) {
+      parsed.destinations = ["segment", "tealium"];
+    }
+    if (Array.isArray(parsed.events)) {
+      parsed.events = parsed.events.map((evt: any) => ({
+        ...evt,
+        validation: evt?.validation ?? { overall_score: 80 },
+      }));
+    }
+    if (parsed.metadata && !parsed.metadata.summary) {
+      parsed.metadata.summary = parsed.metadata.description || parsed.metadata.title || "Tracking specification";
+    }
+
+    return parsed;
   } catch (err) {
     console.error("Failed to parse canonical spec:", err);
     // Return a minimal valid spec

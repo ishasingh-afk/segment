@@ -1,4 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 export type ReviewStatus = "draft" | "pending_approval" | "changes_requested" | "validated" | "approved";
 
@@ -21,15 +24,53 @@ export interface StoredSpec {
   updatedAt: string;
 }
 
-// In-memory storage per client
-const specStore: Map<string, Map<string, StoredSpec>> = new Map();
-
-function getClientStore(clientId: string): Map<string, StoredSpec> {
-  if (!specStore.has(clientId)) {
-    specStore.set(clientId, new Map());
-  }
-  return specStore.get(clientId)!;
+type ClientStore = Record<string, StoredSpec>;
+interface PersistedStore {
+  [clientId: string]: ClientStore;
 }
+
+// Persistent storage on disk (JSON)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const DATA_DIR = path.join(__dirname, "..", "data");
+const STORE_FILE = path.join(DATA_DIR, "specStore.json");
+
+function ensureDataDir() {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+}
+
+let persisted: PersistedStore = {};
+
+function loadStore(): PersistedStore {
+  ensureDataDir();
+  if (fs.existsSync(STORE_FILE)) {
+    try {
+      const raw = fs.readFileSync(STORE_FILE, "utf-8");
+      persisted = JSON.parse(raw) as PersistedStore;
+    } catch (err) {
+      console.error("Failed to read store file; starting fresh", err);
+      persisted = {};
+    }
+  }
+  return persisted;
+}
+
+function saveStore() {
+  ensureDataDir();
+  fs.writeFileSync(STORE_FILE, JSON.stringify(persisted, null, 2), "utf-8");
+}
+
+function getClientStore(clientId: string): ClientStore {
+  if (!persisted[clientId]) {
+    persisted[clientId] = {};
+  }
+  return persisted[clientId];
+}
+
+// Initialize from disk on module load
+loadStore();
 
 export function saveSpec(
   clientId: string,
@@ -46,7 +87,7 @@ export function saveSpec(
   const now = new Date().toISOString();
 
   const id = data.id || uuidv4();
-  const existing = store.get(id);
+  const existing = store[id];
 
   const spec: StoredSpec = {
     id,
@@ -60,7 +101,8 @@ export function saveSpec(
     updatedAt: now,
   };
 
-  store.set(id, spec);
+  store[id] = spec;
+  saveStore();
   return spec;
 }
 
@@ -73,7 +115,7 @@ export function updateReview(
   }
 ): StoredSpec | null {
   const store = getClientStore(clientId);
-  const spec = store.get(specId);
+  const spec = store[specId];
 
   if (!spec) return null;
 
@@ -93,24 +135,28 @@ export function updateReview(
   }
 
   spec.updatedAt = now;
-  store.set(specId, spec);
+  store[specId] = spec;
+  saveStore();
 
   return spec;
 }
 
 export function getSpec(clientId: string, specId: string): StoredSpec | null {
   const store = getClientStore(clientId);
-  return store.get(specId) || null;
+  return store[specId] || null;
 }
 
 export function getAllSpecs(clientId: string): StoredSpec[] {
   const store = getClientStore(clientId);
-  return Array.from(store.values()).sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+  return Object.values(store).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
 
 export function deleteSpec(clientId: string, specId: string): boolean {
   const store = getClientStore(clientId);
-  return store.delete(specId);
+  const exists = !!store[specId];
+  if (exists) {
+    delete store[specId];
+    saveStore();
+  }
+  return exists;
 }
