@@ -2118,12 +2118,14 @@ Please incorporate these answers into the specification and remove the answered 
       </tr>
     </thead>
     <tbody>
-      ${(canonical.destinations || []).map((d: any) => `
+      ${(canonical.destinations || []).map((d: any) => {
+        const dName = typeof d === 'string' ? d : d.name;
+        return `
       <tr>
-        <td>${d.name}</td>
+        <td>${dName}</td>
         <td>${(d.requirements || []).join(", ")}</td>
       </tr>
-      `).join("")}
+      `}).join("")}
     </tbody>
   </table>
 
@@ -2394,7 +2396,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
 
   <h2>Destinations</h2>
   <div class="destinations">
-    ${(canonical.destinations || []).map((d: any) => `<div class="destination">${d.name}</div>`).join('')}
+    ${(canonical.destinations || []).map((d: any) => `<div class="destination">${typeof d === 'string' ? d : d.name}</div>`).join('')}
   </div>
 
   ${canonical.acceptance_criteria?.length ? `
@@ -3949,7 +3951,9 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                     {expandedSpecSections.has("destinations") && (
                       <div style={{ padding: "0 16px 16px" }}>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                          {canonical.destinations.map((dest: any, i: number) => (
+                          {canonical.destinations.map((dest: any, i: number) => {
+                            const destName = typeof dest === 'string' ? dest : dest.name;
+                            return (
                             <div
                               key={i}
                               style={{
@@ -3965,10 +3969,10 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                                 gap: 8,
                               }}
                             >
-                              <CdpIndicator type={dest.name?.toLowerCase()} />
-                              {dest.name}
+                              <CdpIndicator type={destName?.toLowerCase()} />
+                              {destName}
                             </div>
-                          ))}
+                          )})}
                         </div>
                       </div>
                     )}
@@ -5130,7 +5134,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                                     `Verify ${e.name} fires when: ${e.trigger}`,
                                     `Verify all required properties are present: ${e.properties?.filter((p: any) => p.required).map((p: any) => p.name).join(", ") || "None"}`,
                                     `Verify property types are correct`,
-                                    `Verify event reaches destinations: ${canonical?.destinations?.map((d: any) => d.name).join(", ") || "N/A"}`,
+                                    `Verify event reaches destinations: ${canonical?.destinations?.map((d: any) => typeof d === 'string' ? d : d.name).join(", ") || "N/A"}`,
                                   ],
                                   validation_rules: [...(e.business_rules || []), ...(e.technical_rules || [])],
                                 })),
@@ -5277,7 +5281,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                                 data_flow: {
                                   sources: ["Web", "Mobile", "Server"],
                                   cdp_layer: "Segment / Tealium / mParticle",
-                                  destinations: canonical?.destinations?.map((d: any) => d.name) || [],
+                                  destinations: canonical?.destinations?.map((d: any) => typeof d === 'string' ? d : d.name) || [],
                                 },
                                 events_overview: canonical?.events?.map((e: any) => ({
                                   name: e.name,
