@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
 // ============================================================================
 // DESIGN TOKENS (PRD: Inter 14-16px, Walmart-blue CTAs, white cards)
 // ============================================================================
@@ -56,7 +56,7 @@ function getOrCreateClientId(): string {
 }
 
 const CLIENT_ID = getOrCreateClientId();
-const API_BASE = "http://localhost:4000";
+
 
 // ============================================================================
 // AUTHENTICATION TYPES & DEMO USERS
