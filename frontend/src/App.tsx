@@ -1198,7 +1198,7 @@ function App() {
   const [adapterTab, setAdapterTab] = useState<"segment" | "tealium" | "mparticle" | "salesforce">("segment");
 
   // Navigation - default based on role
-  const [activeNav, setActiveNav] = useState<"dashboard" | "specs" | "agent" | "settings">("agent");
+  const [activeNav, setActiveNav] = useState<"dashboard" | "specs" | "agent" | "settings">("dashboard");
 
   // Jira
   const [selectedExportPersona, setSelectedExportPersona] = useState<string>("engineer");
