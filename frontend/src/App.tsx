@@ -1814,11 +1814,9 @@ Please incorporate these answers into the specification and remove the answered 
           "X-Client-Id": CLIENT_ID,
         },
         body: JSON.stringify({
-          id: specId,
+          specId: specId,
           status,
-          commentText: commentText.trim() || undefined,
-          author: currentUser?.name || "Unknown",
-          userRole: currentUser?.role || "user",
+          comment: commentText.trim() ? { text: commentText.trim(), author: currentUser?.name || "Unknown" } : undefined,
         }),
       });
 
