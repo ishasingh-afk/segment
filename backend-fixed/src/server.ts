@@ -427,6 +427,84 @@ app.post("/api/integrations/jira", (req: Request, res: Response) => {
   }
 });
 
+// List Segment Tracking Plans
+app.post("/api/specpilot/segment/tracking-plans", async (req: Request, res: Response) => {
+  try {
+    const { apiToken } = req.body;
+
+    if (!apiToken) {
+      return res.status(400).json({ ok: false, error: "Missing API token" });
+    }
+
+    const segmentRes = await fetch("https://api.segmentapis.com/tracking-plans", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const segmentData = await segmentRes.json();
+
+    if (!segmentRes.ok) {
+      return res.status(segmentRes.status).json({
+        ok: false,
+        error: segmentData.error?.message || segmentData.message || "Failed to fetch tracking plans",
+        details: segmentData,
+      });
+    }
+
+    // Extract tracking plans from response
+    const plans = segmentData.data?.trackingPlans || segmentData.trackingPlans || [];
+    res.json({ ok: true, plans });
+  } catch (err: any) {
+    console.error("Segment list plans error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Create Segment Tracking Plan
+app.post("/api/specpilot/segment/tracking-plans/create", async (req: Request, res: Response) => {
+  try {
+    const { apiToken, name, description } = req.body;
+
+    if (!apiToken) {
+      return res.status(400).json({ ok: false, error: "Missing API token" });
+    }
+    if (!name) {
+      return res.status(400).json({ ok: false, error: "Missing tracking plan name" });
+    }
+
+    const segmentRes = await fetch("https://api.segmentapis.com/tracking-plans", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        description: description || `Created by SpecPilot on ${new Date().toISOString()}`,
+        type: "LIVE",
+      }),
+    });
+
+    const segmentData = await segmentRes.json();
+
+    if (!segmentRes.ok) {
+      return res.status(segmentRes.status).json({
+        ok: false,
+        error: segmentData.error?.message || segmentData.message || "Failed to create tracking plan",
+        details: segmentData,
+      });
+    }
+
+    res.json({ ok: true, plan: segmentData.data?.trackingPlan || segmentData });
+  } catch (err: any) {
+    console.error("Segment create plan error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // Push to Segment Tracking Plan API
 app.post("/api/specpilot/push/segment", async (req: Request, res: Response) => {
   try {

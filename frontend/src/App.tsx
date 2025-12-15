@@ -1200,7 +1200,12 @@ function App() {
   // Segment Push Modal
   const [showSegmentPushModal, setShowSegmentPushModal] = useState(false);
   const [segmentApiToken, setSegmentApiToken] = useState("");
-  const [segmentTrackingPlanId, setSegmentTrackingPlanId] = useState("");
+  const [segmentConnected, setSegmentConnected] = useState(false);
+  const [segmentConnecting, setSegmentConnecting] = useState(false);
+  const [segmentTrackingPlans, setSegmentTrackingPlans] = useState<any[]>([]);
+  const [segmentSelectedPlanId, setSegmentSelectedPlanId] = useState("");
+  const [segmentNewPlanName, setSegmentNewPlanName] = useState("");
+  const [segmentCreatingPlan, setSegmentCreatingPlan] = useState(false);
   const [segmentPushLoading, setSegmentPushLoading] = useState(false);
   const [segmentPushError, setSegmentPushError] = useState<string | null>(null);
   const [segmentPushSuccess, setSegmentPushSuccess] = useState(false);
@@ -2024,10 +2029,82 @@ Please incorporate these answers into the specification and remove the answered 
     }
   }
 
+  // Connect to Segment and fetch tracking plans
+  async function connectToSegment() {
+    if (!segmentApiToken.trim()) {
+      setSegmentPushError("Please enter your API token");
+      return;
+    }
+
+    setSegmentConnecting(true);
+    setSegmentPushError(null);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/specpilot/segment/tracking-plans`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiToken: segmentApiToken.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        setSegmentTrackingPlans(data.plans || []);
+        setSegmentConnected(true);
+        if (data.plans?.length > 0) {
+          setSegmentSelectedPlanId(data.plans[0].id);
+        }
+      } else {
+        setSegmentPushError(data.error || "Failed to connect to Segment");
+      }
+    } catch (err: any) {
+      setSegmentPushError(err.message || "Network error");
+    } finally {
+      setSegmentConnecting(false);
+    }
+  }
+
+  // Create a new Segment Tracking Plan
+  async function createSegmentPlan() {
+    if (!segmentNewPlanName.trim()) {
+      setSegmentPushError("Please enter a name for the new tracking plan");
+      return;
+    }
+
+    setSegmentCreatingPlan(true);
+    setSegmentPushError(null);
+
+    try {
+      const res = await fetch(`${API_BASE}/api/specpilot/segment/tracking-plans/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiToken: segmentApiToken.trim(),
+          name: segmentNewPlanName.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.ok && data.plan) {
+        // Add to plans list and select it
+        setSegmentTrackingPlans(prev => [...prev, data.plan]);
+        setSegmentSelectedPlanId(data.plan.id);
+        setSegmentNewPlanName("");
+      } else {
+        setSegmentPushError(data.error || "Failed to create tracking plan");
+      }
+    } catch (err: any) {
+      setSegmentPushError(err.message || "Network error");
+    } finally {
+      setSegmentCreatingPlan(false);
+    }
+  }
+
   // Push to Segment Tracking Plan
   async function pushToSegment() {
-    if (!segmentApiToken.trim() || !segmentTrackingPlanId.trim()) {
-      setSegmentPushError("Please enter both API token and Tracking Plan ID");
+    if (!segmentSelectedPlanId) {
+      setSegmentPushError("Please select a tracking plan");
       return;
     }
 
@@ -2074,7 +2151,7 @@ Please incorporate these answers into the specification and remove the answered 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           apiToken: segmentApiToken.trim(),
-          trackingPlanId: segmentTrackingPlanId.trim(),
+          trackingPlanId: segmentSelectedPlanId,
           rules,
         }),
       });
@@ -7802,14 +7879,20 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
             justifyContent: "center",
             zIndex: 9999,
           }}
-          onClick={() => setShowSegmentPushModal(false)}
+          onClick={() => {
+            setShowSegmentPushModal(false);
+            setSegmentConnected(false);
+            setSegmentTrackingPlans([]);
+            setSegmentSelectedPlanId("");
+            setSegmentPushSuccess(false);
+          }}
         >
           <div
             style={{
               backgroundColor: theme.colors.surface,
               borderRadius: 12,
               padding: 24,
-              width: 420,
+              width: 480,
               maxWidth: "90vw",
               boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
             }}
@@ -7820,53 +7903,136 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
               Push to Segment
             </h3>
 
+            {/* Step 1: API Token */}
             <div style={{ marginBottom: 16 }}>
               <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: theme.colors.text.secondary, marginBottom: 6 }}>
                 API Token
               </label>
-              <input
-                type="password"
-                value={segmentApiToken}
-                onChange={(e) => setSegmentApiToken(e.target.value)}
-                placeholder="Enter your Segment API token"
-                style={{
-                  width: "100%",
-                  padding: "10px 12px",
-                  borderRadius: 8,
-                  border: `1px solid ${theme.colors.border}`,
-                  backgroundColor: theme.colors.background,
-                  color: theme.colors.text.primary,
-                  fontSize: 14,
-                }}
-              />
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  type="password"
+                  value={segmentApiToken}
+                  onChange={(e) => {
+                    setSegmentApiToken(e.target.value);
+                    if (segmentConnected) {
+                      setSegmentConnected(false);
+                      setSegmentTrackingPlans([]);
+                    }
+                  }}
+                  placeholder="Enter your Segment API token"
+                  disabled={segmentConnected}
+                  style={{
+                    flex: 1,
+                    padding: "10px 12px",
+                    borderRadius: 8,
+                    border: `1px solid ${segmentConnected ? "#10b981" : theme.colors.border}`,
+                    backgroundColor: segmentConnected ? "#f0fdf4" : theme.colors.background,
+                    color: theme.colors.text.primary,
+                    fontSize: 14,
+                  }}
+                />
+                <button
+                  onClick={segmentConnected ? () => {
+                    setSegmentConnected(false);
+                    setSegmentTrackingPlans([]);
+                    setSegmentSelectedPlanId("");
+                  } : connectToSegment}
+                  disabled={segmentConnecting}
+                  style={{
+                    padding: "10px 16px",
+                    borderRadius: 8,
+                    border: "none",
+                    backgroundColor: segmentConnected ? "#f59e0b" : segmentConnecting ? "#94a3b8" : "#52BD95",
+                    color: "#fff",
+                    fontSize: 13,
+                    fontWeight: 500,
+                    cursor: segmentConnecting ? "not-allowed" : "pointer",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {segmentConnecting ? "Connecting..." : segmentConnected ? "Disconnect" : "Connect"}
+                </button>
+              </div>
               <div style={{ fontSize: 11, color: theme.colors.text.muted, marginTop: 4 }}>
                 Get your token from Segment Settings → Access Management → Tokens
               </div>
             </div>
 
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: theme.colors.text.secondary, marginBottom: 6 }}>
-                Tracking Plan ID
-              </label>
-              <input
-                type="text"
-                value={segmentTrackingPlanId}
-                onChange={(e) => setSegmentTrackingPlanId(e.target.value)}
-                placeholder="tp_xxxxx..."
-                style={{
-                  width: "100%",
-                  padding: "10px 12px",
-                  borderRadius: 8,
-                  border: `1px solid ${theme.colors.border}`,
-                  backgroundColor: theme.colors.background,
-                  color: theme.colors.text.primary,
-                  fontSize: 14,
-                }}
-              />
-              <div style={{ fontSize: 11, color: theme.colors.text.muted, marginTop: 4 }}>
-                Find this in Segment → Protocols → Tracking Plans → Select Plan → URL
-              </div>
-            </div>
+            {/* Step 2: Select Tracking Plan (only shown after connected) */}
+            {segmentConnected && (
+              <>
+                <div style={{ borderTop: `1px solid ${theme.colors.border}`, margin: "16px 0", paddingTop: 16 }}>
+                  <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: theme.colors.text.secondary, marginBottom: 6 }}>
+                    Select Tracking Plan
+                  </label>
+                  <select
+                    value={segmentSelectedPlanId}
+                    onChange={(e) => setSegmentSelectedPlanId(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "10px 12px",
+                      borderRadius: 8,
+                      border: `1px solid ${theme.colors.border}`,
+                      backgroundColor: theme.colors.background,
+                      color: theme.colors.text.primary,
+                      fontSize: 14,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {segmentTrackingPlans.length === 0 ? (
+                      <option value="">No tracking plans found</option>
+                    ) : (
+                      segmentTrackingPlans.map((plan: any) => (
+                        <option key={plan.id} value={plan.id}>
+                          {plan.name || plan.display_name || plan.id}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+
+                {/* Create New Plan */}
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ fontSize: 12, color: theme.colors.text.muted, marginBottom: 8 }}>
+                    Or create a new tracking plan:
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input
+                      type="text"
+                      value={segmentNewPlanName}
+                      onChange={(e) => setSegmentNewPlanName(e.target.value)}
+                      placeholder="New plan name..."
+                      style={{
+                        flex: 1,
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        border: `1px solid ${theme.colors.border}`,
+                        backgroundColor: theme.colors.background,
+                        color: theme.colors.text.primary,
+                        fontSize: 13,
+                      }}
+                    />
+                    <button
+                      onClick={createSegmentPlan}
+                      disabled={segmentCreatingPlan || !segmentNewPlanName.trim()}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 8,
+                        border: `1px solid ${theme.colors.border}`,
+                        backgroundColor: "transparent",
+                        color: segmentCreatingPlan ? theme.colors.text.muted : theme.colors.text.primary,
+                        fontSize: 12,
+                        fontWeight: 500,
+                        cursor: segmentCreatingPlan || !segmentNewPlanName.trim() ? "not-allowed" : "pointer",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {segmentCreatingPlan ? "Creating..." : "+ Create"}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
 
             {segmentPushError && (
               <div style={{
@@ -7901,7 +8067,13 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
 
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button
-                onClick={() => setShowSegmentPushModal(false)}
+                onClick={() => {
+                  setShowSegmentPushModal(false);
+                  setSegmentConnected(false);
+                  setSegmentTrackingPlans([]);
+                  setSegmentSelectedPlanId("");
+                  setSegmentPushSuccess(false);
+                }}
                 style={{
                   padding: "10px 20px",
                   borderRadius: 8,
@@ -7917,16 +8089,16 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
               </button>
               <button
                 onClick={pushToSegment}
-                disabled={segmentPushLoading}
+                disabled={segmentPushLoading || !segmentConnected || !segmentSelectedPlanId}
                 style={{
                   padding: "10px 20px",
                   borderRadius: 8,
                   border: "none",
-                  backgroundColor: segmentPushLoading ? "#94a3b8" : "#52BD95",
+                  backgroundColor: (segmentPushLoading || !segmentConnected || !segmentSelectedPlanId) ? "#94a3b8" : "#52BD95",
                   color: "#fff",
                   fontSize: 14,
                   fontWeight: 500,
-                  cursor: segmentPushLoading ? "not-allowed" : "pointer",
+                  cursor: (segmentPushLoading || !segmentConnected || !segmentSelectedPlanId) ? "not-allowed" : "pointer",
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
