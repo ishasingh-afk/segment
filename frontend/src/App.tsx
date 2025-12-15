@@ -1197,6 +1197,14 @@ function App() {
   const [mparticleAdapter, setMparticleAdapter] = useState<any | null>(null);
   const [adapterTab, setAdapterTab] = useState<"segment" | "tealium" | "mparticle" | "salesforce">("segment");
 
+  // Segment Push Modal
+  const [showSegmentPushModal, setShowSegmentPushModal] = useState(false);
+  const [segmentApiToken, setSegmentApiToken] = useState("");
+  const [segmentTrackingPlanId, setSegmentTrackingPlanId] = useState("");
+  const [segmentPushLoading, setSegmentPushLoading] = useState(false);
+  const [segmentPushError, setSegmentPushError] = useState<string | null>(null);
+  const [segmentPushSuccess, setSegmentPushSuccess] = useState(false);
+
   // Navigation - default based on role
   const [activeNav, setActiveNav] = useState<"dashboard" | "specs" | "agent" | "settings">("dashboard");
 
@@ -2013,6 +2021,76 @@ Please incorporate these answers into the specification and remove the answered 
       setJiraStatusMsg("Error connecting Jira.");
     } finally {
       setJiraSaving(false);
+    }
+  }
+
+  // Push to Segment Tracking Plan
+  async function pushToSegment() {
+    if (!segmentApiToken.trim() || !segmentTrackingPlanId.trim()) {
+      setSegmentPushError("Please enter both API token and Tracking Plan ID");
+      return;
+    }
+
+    if (!segmentAdapter) {
+      setSegmentPushError("No Segment adapter data available");
+      return;
+    }
+
+    setSegmentPushLoading(true);
+    setSegmentPushError(null);
+    setSegmentPushSuccess(false);
+
+    try {
+      // Transform to Segment's expected format
+      const rules = {
+        rules: (segmentAdapter.rules?.events || []).map((event: any) => ({
+          key: event.name,
+          type: "TRACK",
+          version: 1,
+          jsonSchema: {
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "type": "object",
+            "properties": {
+              "properties": {
+                "type": "object",
+                "properties": Object.fromEntries(
+                  Object.entries(event.rules?.properties?.properties || {}).map(([key, val]: [string, any]) => [
+                    key,
+                    {
+                      type: val.type || "string",
+                      description: val.description || "",
+                    }
+                  ])
+                ),
+                "required": event.rules?.properties?.required || [],
+              }
+            }
+          }
+        }))
+      };
+
+      const res = await fetch(`${API_BASE}/api/specpilot/push/segment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiToken: segmentApiToken.trim(),
+          trackingPlanId: segmentTrackingPlanId.trim(),
+          rules,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        setSegmentPushSuccess(true);
+        setSegmentPushError(null);
+      } else {
+        setSegmentPushError(data.error || "Failed to push to Segment");
+      }
+    } catch (err: any) {
+      setSegmentPushError(err.message || "Network error");
+    } finally {
+      setSegmentPushLoading(false);
     }
   }
 
@@ -4837,18 +4915,44 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
 
                 {/* Adapter Content with Copy Button */}
                 <div style={{ position: "relative" }}>
-                  <div style={{ 
-                    position: "absolute", 
-                    top: 10, 
-                    right: 10, 
+                  <div style={{
+                    position: "absolute",
+                    top: 10,
+                    right: 10,
                     zIndex: 10,
+                    display: "flex",
+                    gap: 8,
                   }}>
-                    <CopyButton 
+                    {adapterTab === "segment" && segmentAdapter && (
+                      <button
+                        onClick={() => {
+                          setSegmentPushError(null);
+                          setSegmentPushSuccess(false);
+                          setShowSegmentPushModal(true);
+                        }}
+                        style={{
+                          padding: "6px 12px",
+                          borderRadius: 6,
+                          border: "none",
+                          backgroundColor: "#52BD95",
+                          color: "#fff",
+                          fontSize: 12,
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 4,
+                        }}
+                      >
+                        <Icons.Send /> Push to Segment
+                      </button>
+                    )}
+                    <CopyButton
                       text={(() => {
-                        const adapter = adapterTab === "segment" 
-                          ? segmentAdapter 
-                          : adapterTab === "tealium" 
-                            ? tealiumAdapter 
+                        const adapter = adapterTab === "segment"
+                          ? segmentAdapter
+                          : adapterTab === "tealium"
+                            ? tealiumAdapter
                             : mparticleAdapter;
                         return adapter ? JSON.stringify(adapter, null, 2) : "";
                       })()}
@@ -7683,10 +7787,163 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
       </div>
 
       {/* Global Styles */}
+      {/* Segment Push Modal */}
+      {showSegmentPushModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+          onClick={() => setShowSegmentPushModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: theme.colors.surface,
+              borderRadius: 12,
+              padding: 24,
+              width: 420,
+              maxWidth: "90vw",
+              boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ margin: "0 0 20px", fontSize: 18, fontWeight: 600, color: theme.colors.text.primary, display: "flex", alignItems: "center", gap: 8 }}>
+              <CdpIndicator type="segment" size={24} />
+              Push to Segment
+            </h3>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: theme.colors.text.secondary, marginBottom: 6 }}>
+                API Token
+              </label>
+              <input
+                type="password"
+                value={segmentApiToken}
+                onChange={(e) => setSegmentApiToken(e.target.value)}
+                placeholder="Enter your Segment API token"
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  border: `1px solid ${theme.colors.border}`,
+                  backgroundColor: theme.colors.background,
+                  color: theme.colors.text.primary,
+                  fontSize: 14,
+                }}
+              />
+              <div style={{ fontSize: 11, color: theme.colors.text.muted, marginTop: 4 }}>
+                Get your token from Segment Settings → Access Management → Tokens
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", fontSize: 13, fontWeight: 500, color: theme.colors.text.secondary, marginBottom: 6 }}>
+                Tracking Plan ID
+              </label>
+              <input
+                type="text"
+                value={segmentTrackingPlanId}
+                onChange={(e) => setSegmentTrackingPlanId(e.target.value)}
+                placeholder="tp_xxxxx..."
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  borderRadius: 8,
+                  border: `1px solid ${theme.colors.border}`,
+                  backgroundColor: theme.colors.background,
+                  color: theme.colors.text.primary,
+                  fontSize: 14,
+                }}
+              />
+              <div style={{ fontSize: 11, color: theme.colors.text.muted, marginTop: 4 }}>
+                Find this in Segment → Protocols → Tracking Plans → Select Plan → URL
+              </div>
+            </div>
+
+            {segmentPushError && (
+              <div style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                backgroundColor: "#fef2f2",
+                border: "1px solid #fecaca",
+                color: "#dc2626",
+                fontSize: 13,
+                marginBottom: 16,
+              }}>
+                {segmentPushError}
+              </div>
+            )}
+
+            {segmentPushSuccess && (
+              <div style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                backgroundColor: "#f0fdf4",
+                border: "1px solid #bbf7d0",
+                color: "#16a34a",
+                fontSize: 13,
+                marginBottom: 16,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+              }}>
+                <Icons.CheckCircle /> Successfully pushed to Segment!
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setShowSegmentPushModal(false)}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  border: `1px solid ${theme.colors.border}`,
+                  backgroundColor: "transparent",
+                  color: theme.colors.text.secondary,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={pushToSegment}
+                disabled={segmentPushLoading}
+                style={{
+                  padding: "10px 20px",
+                  borderRadius: 8,
+                  border: "none",
+                  backgroundColor: segmentPushLoading ? "#94a3b8" : "#52BD95",
+                  color: "#fff",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: segmentPushLoading ? "not-allowed" : "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                {segmentPushLoading ? "Pushing..." : "Push to Segment"}
+                {!segmentPushLoading && <Icons.Send />}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>
         {`
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-          
+
           @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }

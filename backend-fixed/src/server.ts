@@ -427,6 +427,51 @@ app.post("/api/integrations/jira", (req: Request, res: Response) => {
   }
 });
 
+// Push to Segment Tracking Plan API
+app.post("/api/specpilot/push/segment", async (req: Request, res: Response) => {
+  try {
+    const { apiToken, trackingPlanId, rules } = req.body;
+
+    if (!apiToken) {
+      return res.status(400).json({ ok: false, error: "Missing API token" });
+    }
+    if (!trackingPlanId) {
+      return res.status(400).json({ ok: false, error: "Missing Tracking Plan ID" });
+    }
+    if (!rules) {
+      return res.status(400).json({ ok: false, error: "Missing rules" });
+    }
+
+    // Call Segment API
+    const segmentRes = await fetch(
+      `https://api.segmentapis.com/tracking-plans/${trackingPlanId}/rules`,
+      {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${apiToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(rules),
+      }
+    );
+
+    const segmentData = await segmentRes.json();
+
+    if (!segmentRes.ok) {
+      return res.status(segmentRes.status).json({
+        ok: false,
+        error: segmentData.error?.message || segmentData.message || "Segment API error",
+        details: segmentData,
+      });
+    }
+
+    res.json({ ok: true, data: segmentData });
+  } catch (err: any) {
+    console.error("Segment push error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // ---------- START SERVER ----------
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
