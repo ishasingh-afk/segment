@@ -7725,17 +7725,30 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
         }}
       >
         {/* App Name with DataDrone Logo */}
-        <div style={{ padding: "12px 16px", borderBottom: "1px solid #334155" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-            <img
-              src="/datadrone-logo.png"
-              alt="DataDrone"
-              style={{ height: 28, width: "auto" }}
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#cbd5e1" }}>SpecPilot</div>
+        <div style={{ padding: "16px", borderBottom: "1px solid #334155", textAlign: "center" }}>
+          <img
+            src="/datadrone-logo.png"
+            alt="DataDrone"
+            style={{ height: 36, width: "auto", marginBottom: 8 }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+          <div style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: "#fff",
+            letterSpacing: "0.5px",
+            marginBottom: 4,
+          }}>
+            SpecPilot
           </div>
-          <div style={{ fontSize: 10, color: "#64748b", fontStyle: "italic" }}>Giving Data, The Wings!</div>
+          <div style={{
+            fontSize: 10,
+            color: "#94a3b8",
+            fontStyle: "italic",
+            letterSpacing: "0.3px",
+          }}>
+            Giving Data, The Wings!
+          </div>
         </div>
 
         {/* Navigation */}
