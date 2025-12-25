@@ -1178,6 +1178,8 @@ function App() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingGenerate, setPendingGenerate] = useState(false);
+  const dashboardSearchRef = React.useRef<HTMLInputElement>(null);
   const [loadingStep, setLoadingStep] = useState(0);
   const [copied, setCopied] = useState(false);
   const [canonical, setCanonical] = useState<any | null>(null);
@@ -1476,6 +1478,14 @@ function App() {
     localStorage.setItem("specpilot_dark_mode", darkMode.toString());
     document.documentElement.setAttribute("data-theme", darkMode ? "dark" : "light");
   }, [darkMode]);
+
+  // Auto-generate when navigating from dashboard with input
+  useEffect(() => {
+    if (pendingGenerate && activeNav === "agent" && input.trim()) {
+      setPendingGenerate(false);
+      generateSpec();
+    }
+  }, [pendingGenerate, activeNav, input]);
 
   // ==========================================================================
   // THEME TOKENS (Dynamic based on dark mode)
@@ -2723,6 +2733,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
             >
               <Icons.Search />
               <input
+                ref={dashboardSearchRef}
                 type="text"
                 placeholder="Describe your tracking needs... e.g. 'Track checkout funnel'"
                 onKeyDown={(e) => {
@@ -2730,6 +2741,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                     const val = (e.target as HTMLInputElement).value.trim();
                     if (val) {
                       setInput(val);
+                      setPendingGenerate(true);
                       setActiveNav("agent");
                     }
                   }
@@ -2744,7 +2756,14 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                 }}
               />
               <button
-                onClick={() => setActiveNav("agent")}
+                onClick={() => {
+                  const val = dashboardSearchRef.current?.value.trim() || "";
+                  if (val) {
+                    setInput(val);
+                    setPendingGenerate(true);
+                  }
+                  setActiveNav("agent");
+                }}
                 style={{
                   padding: "10px 22px",
                   borderRadius: 20,
@@ -2780,6 +2799,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                 key={suggestion}
                 onClick={() => {
                   setInput(suggestion);
+                  setPendingGenerate(true);
                   setActiveNav("agent");
                 }}
                 style={{
