@@ -7524,7 +7524,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
             }}
           >
             <img
-              src="/datadrone-logo-white.png"
+              src="/datadrone-logo.png"
               alt="DataDrone"
               style={{ height: 60, width: "auto", marginBottom: 16 }}
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
@@ -7674,7 +7674,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
         {/* App Name with DataDrone Logo */}
         <div style={{ padding: "16px", borderBottom: `1px solid ${darkMode ? "#334155" : theme.colors.border}`, textAlign: "center" }}>
           <img
-            src={darkMode ? "/datadrone-logo-white.png" : "/datadrone-logo.png"}
+            src="/datadrone-logo.png"
             alt="DataDrone"
             style={{ height: 45, width: "auto", marginBottom: 10 }}
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
