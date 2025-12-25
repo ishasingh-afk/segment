@@ -7523,25 +7523,15 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
               color: "#fff",
             }}
           >
-            <div
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 12,
-                backgroundColor: "rgba(255,255,255,0.2)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 16px",
-                fontWeight: 700,
-                fontSize: 20,
-              }}
-            >
-              SP
-            </div>
+            <img
+              src="/datadrone-logo.png"
+              alt="DataDrone"
+              style={{ height: 50, width: "auto", marginBottom: 12 }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
             <h1 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>SpecPilot</h1>
             <p style={{ margin: "8px 0 0", fontSize: 14, opacity: 0.9 }}>
-              CDP Intake Transformation System
+              Giving Data, The Wings!
             </p>
           </div>
 
@@ -7734,10 +7724,18 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
           flexShrink: 0,
         }}
       >
-        {/* App Name */}
+        {/* App Name with DataDrone Logo */}
         <div style={{ padding: "12px 16px", borderBottom: "1px solid #334155" }}>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#cbd5e1" }}>SpecPilot</div>
-          <div style={{ fontSize: 11, color: "#64748b" }}>CDP Intake Transformer</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+            <img
+              src="/datadrone-logo.png"
+              alt="DataDrone"
+              style={{ height: 28, width: "auto" }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+            <div style={{ fontSize: 14, fontWeight: 600, color: "#cbd5e1" }}>SpecPilot</div>
+          </div>
+          <div style={{ fontSize: 10, color: "#64748b", fontStyle: "italic" }}>Giving Data, The Wings!</div>
         </div>
 
         {/* Navigation */}
