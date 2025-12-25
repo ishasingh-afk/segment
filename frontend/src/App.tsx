@@ -7663,15 +7663,16 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
       <div
         style={{
           width: 240,
-          backgroundColor: "#1e293b",
-          color: "#fff",
+          backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+          color: darkMode ? "#fff" : "#1e293b",
           display: "flex",
           flexDirection: "column",
           flexShrink: 0,
+          borderRight: darkMode ? "none" : `1px solid ${theme.colors.border}`,
         }}
       >
         {/* App Name with DataDrone Logo */}
-        <div style={{ padding: "16px", borderBottom: "1px solid #334155", textAlign: "center" }}>
+        <div style={{ padding: "16px", borderBottom: `1px solid ${darkMode ? "#334155" : theme.colors.border}`, textAlign: "center" }}>
           <img
             src="/datadrone-logo.png"
             alt="DataDrone"
@@ -7681,7 +7682,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
           <div style={{
             fontSize: 18,
             fontWeight: 700,
-            color: "#fff",
+            color: darkMode ? "#fff" : "#1e293b",
             letterSpacing: "0.5px",
           }}>
             SpecPilot
@@ -7711,7 +7712,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                   border: "none",
                   borderRadius: tokens.radius.md,
                   backgroundColor: activeNav === item.id ? tokens.colors.primary : "transparent",
-                  color: activeNav === item.id ? "#fff" : "#94a3b8",
+                  color: activeNav === item.id ? "#fff" : (darkMode ? "#94a3b8" : "#64748b"),
                   cursor: "pointer",
                   fontSize: 14,
                   fontWeight: 500,
@@ -7727,7 +7728,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
         </nav>
 
         {/* User */}
-        <div style={{ padding: 16, borderTop: "1px solid #334155" }}>
+        <div style={{ padding: 16, borderTop: `1px solid ${darkMode ? "#334155" : theme.colors.border}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div
               style={{
@@ -7744,7 +7745,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 500 }}>{currentUser.name}</div>
-              <div style={{ fontSize: 11, color: "#94a3b8", display: "flex", alignItems: "center", gap: 4 }}>
+              <div style={{ fontSize: 11, color: darkMode ? "#94a3b8" : "#64748b", display: "flex", alignItems: "center", gap: 4 }}>
                 <span style={{ 
                   padding: "1px 6px", 
                   borderRadius: 4, 
@@ -7764,7 +7765,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
               style={{
                 background: "none",
                 border: "none",
-                color: "#94a3b8",
+                color: darkMode ? "#94a3b8" : "#64748b",
                 cursor: "pointer",
                 padding: 4,
                 borderRadius: 4,
