@@ -74,23 +74,23 @@ interface User {
   avatar?: string;
 }
 
-// Demo users - in production, this would come from a database
+// User authentication
 const DEMO_USERS: Record<string, { password: string; user: User }> = {
-  "approver@specpilot.io": {
-    password: "approver123",
+  "admin@datadrone.com": {
+    password: "admin@123",
     user: {
       id: "user-approver-001",
-      email: "approver@specpilot.io",
-      name: "Alex Approver",
+      email: "admin@datadrone.com",
+      name: "Admin",
       role: "approver",
     },
   },
-  "user@specpilot.io": {
-    password: "user123",
+  "user@datadrone.com": {
+    password: "user@123",
     user: {
       id: "user-001",
-      email: "user@specpilot.io",
-      name: "Sam User",
+      email: "user@datadrone.com",
+      name: "User",
       role: "user",
     },
   },
@@ -1153,7 +1153,7 @@ function App() {
     const userEntry = DEMO_USERS[loginEmail.toLowerCase()];
     
     if (!userEntry) {
-      setLoginError("User not found. Try approver@specpilot.io or user@specpilot.io");
+      setLoginError("Invalid email or password");
       return;
     }
     
@@ -7526,13 +7526,10 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
             <img
               src="/datadrone-logo.png"
               alt="DataDrone"
-              style={{ height: 50, width: "auto", marginBottom: 12 }}
+              style={{ height: 60, width: "auto", marginBottom: 16 }}
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
             <h1 style={{ margin: 0, fontSize: 24, fontWeight: 600 }}>SpecPilot</h1>
-            <p style={{ margin: "8px 0 0", fontSize: 14, opacity: 0.9 }}>
-              Giving Data, The Wings!
-            </p>
           </div>
 
           {/* Login Form */}
@@ -7643,57 +7640,6 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
             >
               Sign In
             </button>
-
-            {/* Demo Credentials */}
-            <div
-              style={{
-                marginTop: 24,
-                padding: 16,
-                backgroundColor: theme.colors.background,
-                borderRadius: tokens.radius.md,
-                fontSize: 13,
-              }}
-            >
-              <div style={{ fontWeight: 600, color: theme.colors.text.primary, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
-                <Icons.Shield /> Demo Credentials
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                <div
-                  onClick={() => {
-                    setLoginEmail("approver@specpilot.io");
-                    setLoginPassword("approver123");
-                  }}
-                  style={{
-                    padding: 12,
-                    backgroundColor: theme.colors.surface,
-                    borderRadius: tokens.radius.sm,
-                    border: `1px solid ${theme.colors.border}`,
-                    cursor: "pointer",
-                  }}
-                >
-                  <div style={{ fontWeight: 600, color: tokens.colors.primary, marginBottom: 4 }}>Approver</div>
-                  <div style={{ fontSize: 11, color: theme.colors.text.muted }}>approver@specpilot.io</div>
-                  <div style={{ fontSize: 11, color: theme.colors.text.muted }}>approver123</div>
-                </div>
-                <div
-                  onClick={() => {
-                    setLoginEmail("user@specpilot.io");
-                    setLoginPassword("user123");
-                  }}
-                  style={{
-                    padding: 12,
-                    backgroundColor: theme.colors.surface,
-                    borderRadius: tokens.radius.sm,
-                    border: `1px solid ${theme.colors.border}`,
-                    cursor: "pointer",
-                  }}
-                >
-                  <div style={{ fontWeight: 600, color: "#16a34a", marginBottom: 4 }}>User</div>
-                  <div style={{ fontSize: 11, color: theme.colors.text.muted }}>user@specpilot.io</div>
-                  <div style={{ fontSize: 11, color: theme.colors.text.muted }}>user123</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -7729,7 +7675,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
           <img
             src="/datadrone-logo.png"
             alt="DataDrone"
-            style={{ height: 36, width: "auto", marginBottom: 8 }}
+            style={{ height: 45, width: "auto", marginBottom: 10 }}
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
           <div style={{
@@ -7737,17 +7683,8 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
             fontWeight: 700,
             color: "#fff",
             letterSpacing: "0.5px",
-            marginBottom: 4,
           }}>
             SpecPilot
-          </div>
-          <div style={{
-            fontSize: 10,
-            color: "#94a3b8",
-            fontStyle: "italic",
-            letterSpacing: "0.3px",
-          }}>
-            Giving Data, The Wings!
           </div>
         </div>
 
