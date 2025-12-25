@@ -43,19 +43,22 @@ const tokens = {
 };
 
 // ============================================================================
-// CLIENT ID (workspace isolation)
+// CLIENT ID (user-specific workspace isolation)
 // ============================================================================
-function getOrCreateClientId(): string {
-  const key = "specpilot_client_id";
+function getClientIdForUser(userId: string | null): string {
+  if (!userId) {
+    return "anonymous";
+  }
+  // Each user gets their own client ID for workspace isolation
+  const key = `specpilot_client_id_${userId}`;
   let existing = localStorage.getItem(key);
   if (!existing) {
-    existing = crypto.randomUUID();
+    existing = `${userId}_${crypto.randomUUID()}`;
     localStorage.setItem(key, existing);
   }
   return existing;
 }
 
-const CLIENT_ID = getOrCreateClientId();
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
 
 // ============================================================================
@@ -1137,9 +1140,12 @@ function App() {
   const [showPassword, setShowPassword] = useState(false);
 
   // Get permissions for current user
-  const permissions = currentUser 
-    ? ROLE_PERMISSIONS[currentUser.role] 
+  const permissions = currentUser
+    ? ROLE_PERMISSIONS[currentUser.role]
     : null;
+
+  // User-specific client ID for workspace isolation
+  const clientId = React.useMemo(() => getClientIdForUser(currentUser?.id || null), [currentUser?.id]);
 
   // Login handler
   const handleLogin = () => {
@@ -1453,7 +1459,7 @@ function App() {
     const loadValidationConfig = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/validation-config`, {
-          headers: { "X-Client-Id": CLIENT_ID },
+          headers: { "X-Client-Id": clientId },
         });
         const data = await res.json();
         if (data.ok && data.config) {
@@ -1486,6 +1492,17 @@ function App() {
       generateSpec();
     }
   }, [pendingGenerate, activeNav, input]);
+
+  // Reload specs when user changes (user-specific workspace)
+  useEffect(() => {
+    if (currentUser) {
+      loadSpecList();
+      // Clear any loaded spec from previous user
+      setCanonical(null);
+      setResult("");
+      setSpecId(null);
+    }
+  }, [clientId]);
 
   // ==========================================================================
   // THEME TOKENS (Dynamic based on dark mode)
@@ -1602,7 +1619,7 @@ VALIDATION RULES:
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-Client-Id": CLIENT_ID,
+              "X-Client-Id": clientId,
             },
             body: JSON.stringify({ 
               canonicalSpec, 
@@ -1718,7 +1735,7 @@ Please incorporate these answers into the specification and remove the answered 
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "X-Client-Id": CLIENT_ID,
+                "X-Client-Id": clientId,
               },
               body: JSON.stringify({
                 canonicalSpec: canonicalData.canonicalSpec,
@@ -1766,7 +1783,7 @@ Please incorporate these answers into the specification and remove the answered 
 
     try {
       const res = await fetch(`${API_BASE}/api/specpilot/spec/${idToLoad}`, {
-        headers: { "X-Client-Id": CLIENT_ID },
+        headers: { "X-Client-Id": clientId },
       });
       const data = await res.json();
 
@@ -1834,7 +1851,7 @@ Please incorporate these answers into the specification and remove the answered 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Client-Id": CLIENT_ID,
+          "X-Client-Id": clientId,
         },
         body: JSON.stringify({
           specId: specId,
@@ -1892,7 +1909,7 @@ Please incorporate these answers into the specification and remove the answered 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Client-Id": CLIENT_ID,
+          "X-Client-Id": clientId,
         },
       });
 
@@ -1939,7 +1956,7 @@ Please incorporate these answers into the specification and remove the answered 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Client-Id": CLIENT_ID,
+          "X-Client-Id": clientId,
         },
         body: JSON.stringify({
           specId,
@@ -1991,7 +2008,7 @@ Please incorporate these answers into the specification and remove the answered 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Client-Id": CLIENT_ID,
+          "X-Client-Id": clientId,
         },
         body: JSON.stringify({ webhookUrl: slackWebhookInput.trim() }),
       });
@@ -2019,7 +2036,7 @@ Please incorporate these answers into the specification and remove the answered 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Client-Id": CLIENT_ID,
+          "X-Client-Id": clientId,
         },
         body: JSON.stringify({
           baseUrl: jiraBaseUrlInput.trim(),
@@ -2185,7 +2202,7 @@ Please incorporate these answers into the specification and remove the answered 
     setSpecsLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/specpilot/specs`, {
-        headers: { "X-Client-Id": CLIENT_ID },
+        headers: { "X-Client-Id": clientId },
       });
       const data = await res.json();
       if (data.ok) {
@@ -4507,7 +4524,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                                       method: "POST",
                                       headers: {
                                         "Content-Type": "application/json",
-                                        "X-Client-Id": CLIENT_ID,
+                                        "X-Client-Id": clientId,
                                       },
                                       body: JSON.stringify({
                                         id: specId,
@@ -4643,7 +4660,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                             method: "POST",
                             headers: {
                               "Content-Type": "application/json",
-                              "X-Client-Id": CLIENT_ID,
+                              "X-Client-Id": clientId,
                             },
                             body: JSON.stringify({
                               id: specId,
@@ -6672,7 +6689,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                                     try {
                                       await fetch(`${API_BASE}/api/specpilot/review`, {
                                         method: "POST",
-                                        headers: { "Content-Type": "application/json", "X-Client-Id": CLIENT_ID },
+                                        headers: { "Content-Type": "application/json", "X-Client-Id": clientId },
                                         body: JSON.stringify({ id: spec.id, status: "validated", userRole: "approver", author: currentUser?.name }),
                                       });
                                       loadSpecList();
@@ -6703,7 +6720,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                                     try {
                                       await fetch(`${API_BASE}/api/specpilot/review`, {
                                         method: "POST",
-                                        headers: { "Content-Type": "application/json", "X-Client-Id": CLIENT_ID },
+                                        headers: { "Content-Type": "application/json", "X-Client-Id": clientId },
                                         body: JSON.stringify({ id: spec.id, status: "approved", userRole: "approver", author: currentUser?.name }),
                                       });
                                       loadSpecList();
@@ -6987,7 +7004,7 @@ ${props.map((p: any) => `    '${p.name}': ${p.type === 'string' ? "'value'" : p.
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
-                      "X-Client-Id": CLIENT_ID,
+                      "X-Client-Id": clientId,
                     },
                     body: JSON.stringify({ config: validationConfig }),
                   });
