@@ -2,6 +2,22 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 
 // ============================================================================
+// UUID HELPER (fallback for non-HTTPS contexts where crypto.randomUUID fails)
+// ============================================================================
+function generateUUID(): string {
+  // Use crypto.randomUUID if available (HTTPS contexts)
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback for HTTP contexts
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+// ============================================================================
 // DESIGN TOKENS (PRD: Inter 14-16px, Walmart-blue CTAs, white cards)
 // ============================================================================
 const tokens = {
@@ -53,7 +69,7 @@ function getClientIdForUser(userId: string | null): string {
   const key = `specpilot_client_id_${userId}`;
   let existing = localStorage.getItem(key);
   if (!existing) {
-    existing = `${userId}_${crypto.randomUUID()}`;
+    existing = `${userId}_${generateUUID()}`;
     localStorage.setItem(key, existing);
   }
   return existing;
@@ -1356,7 +1372,7 @@ function App() {
   // Add audit log helper
   const addAuditLog = (action: string, details: string, specId?: string, specTitle?: string) => {
     const newLog = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       action,
       details,
       specId,
